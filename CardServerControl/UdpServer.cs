@@ -95,6 +95,12 @@ namespace CardServerControl
             }
         }
 
+
+        /// <summary>
+        /// 处理数据并根据数据返回相应的数据包
+        /// </summary>
+        /// <param name="Text">收到的文本</param>
+        /// <returns>数据包</returns>
         private byte[] ResponsePacket(string Text)
         {
             string[] tempArgs = Text.Split(new char[] { ' ' });
@@ -117,15 +123,17 @@ namespace CardServerControl
                 string password = arguments[1];
 
                 //查询数据库
-                string command = string.Format("SELECT * FROM account WHERE Account = {0} AND Password = {1}", username, password);
-                MySqlDataReader msdr = MySQLHelper.ExecuteReader(MySQLHelper.Conn, CommandType.Text, command, null);
-                if (msdr.FieldCount != 0)
+                string command = string.Format("SELECT * FROM account WHERE Account = '{0}' AND Password = '{1}'", username, password);
+                int i = MySqlHelper.ExecuteNonQuery(MySQLHelper.Conn, command, null);
+                if (i > 0)
                 {
                     //登陆成功
-                    msdr.Read();
+                    LogsSystem.Instance.Print(string.Format("账户{0}已登录到系统", username));
+
+                    //为数据表创建uuid并写入
                     string uuid = System.Guid.NewGuid().ToString();
-                    command = string.Format("UPDATE account SET UUID = {0} WHERE Account = {1} AND Password = {2}", uuid, username, password);
-                    MySQLHelper.ExecuteNonQuery(MySQLHelper.Conn, CommandType.Text, command, null);//为数据表创建uuid并写入
+                    command = string.Format("UPDATE account SET UUID = '{0}',LastLogin = '{1}' WHERE Account = '{2}' AND Password = '{3}'", uuid, GetTimeStamp(), username, password);
+                    MySQLHelper.ExecuteNonQuery(MySQLHelper.Conn, CommandType.Text, command, null);
 
                     AddArguments(ref responseText, "true");
                     AddArguments(ref responseText, username);

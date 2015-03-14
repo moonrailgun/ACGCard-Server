@@ -12,3 +12,17 @@ G:\Study\c#软件编程\CardWarfare\CardServer\CardServerControl\obj\Debug\CardS
 G:\Study\c#软件编程\CardWarfare\CardServer\CardServerControl\obj\Debug\CardServerControl.exe
 G:\Study\c#软件编程\CardWarfare\CardServer\CardServerControl\obj\Debug\CardServerControl.pdb
 G:\Study\c#软件编程\CardWarfare\CardServer\CardServerControl\bin\Debug\MySql.Data.dll
+G:\Study\ACGCard Server\CardServer\CardServerControl\bin\Debug\CardServerControl.exe.config
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.exe
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.pdb
+G:\Study\ACGCard Server\CardServer\CardServerControl\bin\Debug\CardServerControl.exe
+G:\Study\ACGCard Server\CardServer\CardServerControl\bin\Debug\CardServerControl.pdb
+G:\Study\ACGCard Server\CardServer\CardServerControl\bin\Debug\MySql.Data.dll
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.csprojResolveAssemblyReference.cache
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\MainWindow.baml
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\MainWindow.g.cs
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\App.g.cs
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl_MarkupCompile.cache
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.g.resources
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.Properties.Resources.resources
+G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.csproj.GenerateResource.Cache
