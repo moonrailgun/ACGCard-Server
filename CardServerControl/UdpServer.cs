@@ -27,15 +27,18 @@ namespace CardServerControl
         }
         #endregion
 
-        private UdpClient udp;
+        private UdpClient receiveClient;
+        private UdpClient sendClient;
         private IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-        private int port = 23333;
+        private int localPort = 23333;//服务端端口
+        private int remotePort = 22233;//客户端端口
         private LogsSystem log;
         private Thread thread;
 
         public UdpServer()
         {
-            this.udp = new UdpClient(port);
+            this.receiveClient = new UdpClient(localPort);
+            this.sendClient = new UdpClient();
             log = LogsSystem.Instance;
         }
 
@@ -62,20 +65,21 @@ namespace CardServerControl
 
         private void Listen()
         {
-            log.Print("[服务器]开始监听端口：" + port);
-            //thread.IsBackground = true;//将线程设为后台运行
+            log.Print("[服务器]开始监听端口：" + localPort);
+            this.thread.IsBackground = true;//将线程设为后台线程,当前台线程全部关闭后会自动关闭后台线程
 
             while (true)
             {
                 //接受
                 IPEndPoint remoteEP = null;
-                byte[] receivedInf = udp.Receive(ref remoteEP);
+                byte[] receivedInf = receiveClient.Receive(ref remoteEP);
                 string Text = Encoding.UTF8.GetString(receivedInf);
                 log.Print(string.Format("[远程{0}]{1}", remoteEP.ToString(), Text));
 
                 //响应
+                remoteEP.Port = remotePort;
                 byte[] response = ResponsePacket(Text);
-                udp.Send(response, response.Length, remoteEP);
+                sendClient.Send(response, response.Length, remoteEP);
                 log.Print(string.Format("[发送至{0}]{1}", remoteEP.ToString(), Encoding.UTF8.GetString(response)));
             }
         }
@@ -84,7 +88,7 @@ namespace CardServerControl
         {
             if (this.thread != null)
             {
-                log.Print("[服务器]关闭监听端口：" + port);
+                log.Print("[服务器]关闭监听端口：" + localPort);
                 this.thread.Abort();
                 log.Print("[线程]" + this.thread.ThreadState.ToString());
                 this.thread = null;
@@ -123,9 +127,9 @@ namespace CardServerControl
                 string password = arguments[1];
 
                 //查询数据库
-                string command = string.Format("SELECT * FROM account WHERE Account = '{0}' AND Password = '{1}'", username, password);
-                int i = MySqlHelper.ExecuteNonQuery(MySQLHelper.Conn, command, null);
-                if (i > 0)
+                string command = string.Format("SELECT count(*) FROM account WHERE Account = '{0}' AND Password = '{1}'", username, password);
+                DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn,CommandType.Text, command, null);
+                if (Convert.ToInt32(ds.Tables[0].Rows[0]["count(*)"]) != 0)
                 {
                     //登陆成功
                     LogsSystem.Instance.Print(string.Format("账户{0}已登录到系统", username));
@@ -145,15 +149,6 @@ namespace CardServerControl
                     AddArguments(ref responseText, "false");
                 }
             }
-
-
-
-
-
-
-
-
-
 
             //结束----
             byte[] response = Encoding.UTF8.GetBytes(responseText);

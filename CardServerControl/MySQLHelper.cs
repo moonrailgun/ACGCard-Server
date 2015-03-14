@@ -25,7 +25,6 @@ namespace CardServerControl
         /// <returns>执行命令所影响的行数</returns>
         public static int ExecuteNonQuery(string connectionString, CommandType cmdType, string cmdText, params MySqlParameter[] commandParameters)
         {
-
             MySqlCommand cmd = new MySqlCommand();
 
             using (MySqlConnection conn = new MySqlConnection(connectionString))
