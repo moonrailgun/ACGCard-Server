@@ -122,7 +122,7 @@ namespace CardServerControl
             string[] arguments = GetOperationArguments(tempArgs);
             if (operationName == "login")
             {
-                //登陆============================================================================================================================
+                //==========================================登陆==========================================
                 string username = arguments[0];
                 string password = arguments[1];
 
@@ -134,6 +134,8 @@ namespace CardServerControl
                     //登陆成功
                     LogsSystem.Instance.Print(string.Format("账户{0}已登录到系统", username));
 
+                    //---------------------------------------------------这里写添加到服务器的用户列表事件
+
                     //为数据表创建uuid并写入
                     string uuid = System.Guid.NewGuid().ToString();
                     command = string.Format("UPDATE account SET UUID = '{0}',LastLogin = '{1}' WHERE Account = '{2}' AND Password = '{3}'", uuid, GetTimeStamp(), username, password);
@@ -142,6 +144,7 @@ namespace CardServerControl
                     AddArguments(ref responseText, "true");
                     AddArguments(ref responseText, username);
                     AddArguments(ref responseText, password);
+                    AddArguments(ref responseText, uuid);
                 }
                 else
                 {
