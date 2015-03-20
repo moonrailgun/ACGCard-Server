@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Controls;
+using System.Threading;
 
 namespace CardServerControl
 {
@@ -40,9 +41,16 @@ namespace CardServerControl
         /// </summary>
         private void SetLogFileInfo()
         {
-            logDate = DateTime.Now.ToString("yyyy-MM-dd");
-            logPath = Environment.CurrentDirectory + "/Logs/";
-            logFileName = logPath + logDate + ".log";
+            try
+            {
+                logDate = DateTime.Now.ToString("yyyy-MM-dd");
+                logPath = Environment.CurrentDirectory + "/Logs/";
+                logFileName = logPath + logDate + ".log";
+            }
+            catch (Exception ex)
+            {
+                AddLogItemInvoke("发生异常:" + ex);
+            }
         }
 
         /// <summary>
@@ -69,17 +77,8 @@ namespace CardServerControl
             {
                 string log = string.Format("[{0} {1}] : {2}", DateTime.Now.ToString("HH:mm:ss"), level.ToString(), mainLog);
 
-                //创建日志文件
-                if (!File.Exists(logFileName))
-                {
-                    if (!Directory.Exists(logPath))
-                    {
-                        Directory.CreateDirectory(logPath);
-                    }
-                    File.Create(logFileName);
-                }
-                //写入文档
-                StreamWriter sw = new StreamWriter(logFileName, true);
+                //写入数据
+                StreamWriter sw = new StreamWriter(new FileStream(logFileName, FileMode.Append));
                 sw.WriteLine(log);
                 sw.Close();
 

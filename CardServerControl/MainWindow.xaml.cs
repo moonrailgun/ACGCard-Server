@@ -64,6 +64,10 @@ namespace CardServerControl
                     UnkownCommand();
                 }
             }
+            else if (args[0] == "list")
+            {
+                ShowPlayerList(null, null);
+            }
             else if (args[0] == "help")
             {
                 //打开帮助页
@@ -172,6 +176,29 @@ namespace CardServerControl
         {
             string URL = @"http://www.moonrailgun.com/help";
             Process.Start("explorer.exe", URL);
+        }
+
+        /// <summary>
+        /// 显示在线所有玩家
+        /// </summary>
+        private void ShowPlayerList(object sender, RoutedEventArgs e)
+        {
+            List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+            int i = 0;
+            string listTXT = "";
+            foreach (Player player in playerList)
+            {
+                if (listTXT == "")
+                {
+                    listTXT = player.username;
+                }
+                else
+                {
+                    listTXT += "," + player.username;
+                }
+                i++;
+            }
+            logsSystem.Print(string.Format("\r\n\t当前在线玩家为{0}/{1}\r\n\t玩家列表:{2}", i, PlayerManager.Instance.maxPlayerNumber, listTXT));
         }
         #endregion
     }
