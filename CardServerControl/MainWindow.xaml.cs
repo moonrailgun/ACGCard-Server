@@ -68,6 +68,19 @@ namespace CardServerControl
             {
                 ShowPlayerList(null, null);
             }
+            else if (args[0] == "say")
+            {
+                string message = args[1];
+                if (args.Length > 2)
+                {
+                    for (int i = 2; i < args.Length; i++)
+                    {
+                        message += "-" + args[i];
+                    }
+                }
+                message = string.Format("{0} chat true {1} server", UdpServer.GetTimeStamp().ToString(), message);
+                UdpServer.Instance.SendToAllPlayer(Encoding.UTF8.GetBytes(message));
+            }
             else if (args[0] == "help")
             {
                 //打开帮助页

@@ -28,8 +28,8 @@ namespace CardServerControl
         #endregion
 
 
-        private UdpClient receiveClient;
-        private UdpClient sendClient;
+        public UdpClient receiveClient;
+        public UdpClient sendClient;
         private IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
         private int localPort = 23333;//服务端端口
         private int remotePort = 22233;//客户端端口
@@ -93,6 +93,7 @@ namespace CardServerControl
                 this.thread.Abort();
                 log.Print("[线程]" + this.thread.ThreadState.ToString());
                 this.thread = null;
+                PlayerManager.Instance.ClearPlayerList();
             }
             else
             {
@@ -206,6 +207,16 @@ namespace CardServerControl
             //结束----
             byte[] response = Encoding.UTF8.GetBytes(responseText);
             return response;
+        }
+
+        public void SendToAllPlayer(byte[] messageByte)
+        {
+            List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+            foreach (Player player in playerList)
+            {
+                //-------------------------------注意这里是同步发送所以后期可能需要修改
+                sendClient.Send(messageByte, messageByte.Length, player.IPAddress, remotePort);
+            }
         }
 
 

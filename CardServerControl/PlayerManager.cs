@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * TODO
+ * 添加对所有玩家时时刻刻发送消息检测是否在线的机制
+ */
 namespace CardServerControl
 {
     class PlayerManager
@@ -79,6 +83,11 @@ namespace CardServerControl
                 }
             }
             return "";
+        }
+
+        public void ClearPlayerList()
+        {
+            playerList.Clear();
         }
     }
 }
