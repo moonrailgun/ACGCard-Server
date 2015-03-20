@@ -7,6 +7,6 @@ namespace CardServerControl
     {
         public string username;
         public string UUID;
-
+        public string IPAddress;
     }
 }

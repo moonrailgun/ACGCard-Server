@@ -79,7 +79,7 @@ namespace CardServerControl
 
                 //响应
                 remoteEP.Port = remotePort;
-                byte[] response = ResponsePacket(Text);
+                byte[] response = ResponsePacket(Text, remoteEP);
                 sendClient.Send(response, response.Length, remoteEP);
                 log.Print(string.Format("[发送至{0}]{1}", remoteEP.ToString(), Encoding.UTF8.GetString(response)));
             }
@@ -104,11 +104,12 @@ namespace CardServerControl
         /// <summary>
         /// 处理数据并根据数据返回相应的数据包
         /// </summary>
-        /// <param name="Text">收到的文本</param>
+        /// <param name="text">收到的文本</param>
+        /// <param name="toIped">发送给对方的IP地址</param>
         /// <returns>数据包</returns>
-        private byte[] ResponsePacket(string Text)
+        private byte[] ResponsePacket(string text, IPEndPoint toIped)
         {
-            string[] tempArgs = Text.Split(new char[] { ' ' });
+            string[] tempArgs = text.Split(new char[] { ' ' });
             string ticks = tempArgs[0];
             long ping = Math.Abs(GetTimeStamp() - Convert.ToInt64(ticks));//返回数据包从发送到接受所用的时间(ms)
 
@@ -129,13 +130,13 @@ namespace CardServerControl
 
                 //查询数据库
                 string command = string.Format("SELECT count(*) FROM account WHERE Account = '{0}' AND Password = '{1}'", username, password);
-                DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn,CommandType.Text, command, null);
+                DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
 
                 //如果密码错误或者服务器已满都返回登陆失败
                 if ((Convert.ToInt32(ds.Tables[0].Rows[0]["count(*)"]) != 0) && PlayerManager.Instance.CanLogin())
                 {
                     //登陆成功
-                    LogsSystem.Instance.Print(string.Format("账户{0}已登录到系统", username));
+                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]已登录到系统", username, toIped.Address.ToString()));
 
                     //为数据表创建uuid并写入
                     string uuid = System.Guid.NewGuid().ToString();
@@ -143,7 +144,7 @@ namespace CardServerControl
                     MySQLHelper.ExecuteNonQuery(MySQLHelper.Conn, CommandType.Text, command, null);
 
                     //添加到服务器的用户列表
-                    PlayerManager.Instance.PlayerLogin(username, uuid);
+                    PlayerManager.Instance.PlayerLogin(username, uuid, toIped.Address.ToString());
 
                     AddArguments(ref responseText, "true");
                     AddArguments(ref responseText, username);
@@ -156,21 +157,56 @@ namespace CardServerControl
                     AddArguments(ref responseText, "false");
                 }
             }
+            else if (operationName == "chat")
+            {
+                string message = arguments[0];
+                string uuid = arguments[1];
+                string toUUID = "";
+                if (arguments.Length > 2)
+                {
+                    toUUID = arguments[2];
+                }
+
+                LogsSystem.Instance.Print(string.Format("[用户]{0}:{1}", PlayerManager.Instance.GetPlayerNameByUUID(uuid), message));
+                if (string.IsNullOrEmpty(toUUID))
+                {
+                    //发送给所有玩家
+                    List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+                    foreach (Player player in playerList)
+                    {
+                        if (player.UUID != uuid)
+                        {
+                            //-------------------------------注意这里是同步发送所以后期可能需要修改
+                            string sendTxt = string.Format("{0} chat true {1} {2}", GetTimeStamp().ToString(), message, uuid);
+                            byte[] sendByte = Encoding.UTF8.GetBytes(sendTxt);
+                            sendClient.Send(sendByte, sendByte.Length, player.IPAddress, remotePort);
+                        }
+                    }
+                }
+                else
+                {
+                    //发送给特定玩家
+                    //私聊
+                    List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+                    foreach (Player player in playerList)
+                    {
+                        if (player.UUID == toUUID)
+                        {
+                            string sendTxt = string.Format("{0} privatechat true {1} {2}", GetTimeStamp().ToString(), message, uuid);
+                            byte[] sendByte = Encoding.UTF8.GetBytes(sendTxt);
+                            sendClient.Send(sendByte, sendByte.Length, player.IPAddress, remotePort);
+                        }
+                    }
+                }
+
+                //发给发送方
+                AddArguments(ref responseText, "true");
+            }
 
             //结束----
             byte[] response = Encoding.UTF8.GetBytes(responseText);
             return response;
         }
-
-
-
-
-
-
-
-
-
-
 
 
 

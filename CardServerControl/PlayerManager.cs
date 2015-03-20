@@ -32,11 +32,12 @@ namespace CardServerControl
             maxPlayerNumber = 20;
         }
 
-        public void PlayerLogin(string username,string UUID)
+        public void PlayerLogin(string username,string UUID,string ip)
         {
             Player player = new Player();
             player.username = username;
             player.UUID = UUID;
+            player.IPAddress = ip;
 
             this.playerList.Add(player);
         }
@@ -63,6 +64,21 @@ namespace CardServerControl
         public bool CanLogin()
         {
             return GetPlayerNumber() < maxPlayerNumber;
+        }
+
+        /// <summary>
+        /// 根据UUID获取玩家姓名
+        /// </summary>
+        public string GetPlayerNameByUUID(string uuid)
+        {
+            foreach (Player player in playerList)
+            {
+                if (player.UUID == uuid)
+                {
+                    return player.username;
+                }
+            }
+            return "";
         }
     }
 }
