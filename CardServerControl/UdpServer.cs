@@ -130,7 +130,9 @@ namespace CardServerControl
                 //查询数据库
                 string command = string.Format("SELECT count(*) FROM account WHERE Account = '{0}' AND Password = '{1}'", username, password);
                 DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn,CommandType.Text, command, null);
-                if (Convert.ToInt32(ds.Tables[0].Rows[0]["count(*)"]) != 0)
+
+                //如果密码错误或者服务器已满都返回登陆失败
+                if ((Convert.ToInt32(ds.Tables[0].Rows[0]["count(*)"]) != 0) && PlayerManager.Instance.CanLogin())
                 {
                     //登陆成功
                     LogsSystem.Instance.Print(string.Format("账户{0}已登录到系统", username));

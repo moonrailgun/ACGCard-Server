@@ -45,5 +45,24 @@ namespace CardServerControl
         {
             return this.playerList;
         }
+
+        /// <summary>
+        /// 返回现在玩家人数
+        /// </summary>
+        public int GetPlayerNumber()
+        {
+            return playerList.Count;
+        }
+
+        /// <summary>
+        /// 返回是否能登陆
+        /// true：可以登陆
+        /// false：不能登陆，服务器已满
+        /// </summary>
+        /// <returns></returns>
+        public bool CanLogin()
+        {
+            return GetPlayerNumber() < maxPlayerNumber;
+        }
     }
 }
