@@ -78,9 +78,11 @@ namespace CardServerControl
                 string log = string.Format("[{0} {1}] : {2}", DateTime.Now.ToString("HH:mm:ss"), level.ToString(), mainLog);
 
                 //写入数据
-                StreamWriter sw = new StreamWriter(new FileStream(logFileName, FileMode.Append));
+                FileStream fs = new FileStream(logFileName, FileMode.Append);
+                StreamWriter sw = new StreamWriter(fs);
                 sw.WriteLine(log);
                 sw.Close();
+                fs.Close();
 
                 //写入控制台
                 if (listBox != null)
