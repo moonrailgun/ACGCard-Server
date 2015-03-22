@@ -70,6 +70,7 @@ namespace CardServerControl
             }
             else if (args[0] == "say")
             {
+                /*
                 string message = args[1];
                 if (args.Length > 2)
                 {
@@ -78,8 +79,11 @@ namespace CardServerControl
                         message += "-" + args[i];
                     }
                 }
-                message = string.Format("{0} chat true {1} server", UdpServer.GetTimeStamp().ToString(), message);
+                message = string.Format("{0} chat true {1} server", .GetTimeStamp().ToString(), message);
                 UdpServer.Instance.SendToAllPlayer(Encoding.UTF8.GetBytes(message));
+                 */
+
+                logsSystem.Print("尚未完成群体聊天功能");
             }
             else if (args[0] == "help")
             {

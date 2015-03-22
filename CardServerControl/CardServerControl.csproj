@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LitJson">
+      <HintPath>..\..\..\Unity3D Project\ACGCard\Assets\Scripts\Network\Util\LitJson.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\lib\Mysql\MySql.Data.dll</HintPath>
     </Reference>
@@ -56,10 +59,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\SocketModel.cs" />
+    <Compile Include="Model\SocketProtocol.cs" />
     <Compile Include="MySQLHelper.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerManager.cs" />
     <Compile Include="UdpServer.cs" />
+    <Compile Include="Util\JsonCoding.cs" />
+    <Compile Include="Util\PacketProcess.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -101,6 +108,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
