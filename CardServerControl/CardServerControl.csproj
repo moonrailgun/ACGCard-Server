@@ -59,6 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\AreaCode.cs" />
+    <Compile Include="Model\DTO\CommonDTO.cs" />
+    <Compile Include="Model\DTO\LoginDTO.cs" />
+    <Compile Include="Model\ReturnCode.cs" />
     <Compile Include="Model\SocketModel.cs" />
     <Compile Include="Model\SocketProtocol.cs" />
     <Compile Include="MySQLHelper.cs" />

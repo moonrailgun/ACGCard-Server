@@ -149,6 +149,7 @@ namespace CardServerControl
             }
             catch (Exception e)
             {
+                LogsSystem.Instance.Print("无法链接到Mysql服务器", LogLevel.ERROR);
                 throw e;
             }
         }

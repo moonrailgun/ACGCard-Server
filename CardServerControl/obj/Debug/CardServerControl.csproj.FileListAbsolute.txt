@@ -26,3 +26,4 @@ G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl
 G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.g.resources
 G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.Properties.Resources.resources
 G:\Study\ACGCard Server\CardServer\CardServerControl\obj\Debug\CardServerControl.csproj.GenerateResource.Cache
+G:\Study\ACGCard Server\CardServer\CardServerControl\bin\Debug\LitJson.dll
