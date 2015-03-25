@@ -55,9 +55,26 @@ namespace CardServerControl.Util
             return model;
         }
 
-        public SocketModel ChatPacket()
+        public SocketModel ChatPacket(ChatDTO data)
         {
-            return null;
+            string content = data.content;
+            string senderUUID = data.senderUUID;
+            string toUUID = data.toUUID;
+
+            foreach (Player player in PlayerManager.Instance.GetPlayerList())
+            {
+                if (player.UUID != senderUUID)
+                {
+                    SocketModel chatmodel = new SocketModel();
+                    chatmodel.areaCode = AreaCode.Server;
+                    chatmodel.protocol = SocketProtocol.CHAT;
+                    chatmodel.message = JsonCoding<ChatDTO>.encode(new ChatDTO(content, senderUUID));
+
+                    UdpServer.Instance.SendToPlayerByUUID(JsonCoding<SocketModel>.encode(chatmodel), player.UUID);
+                }
+            }
+
+            return null;//不返回数据包
         }
     }
 }

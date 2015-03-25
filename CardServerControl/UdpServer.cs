@@ -29,15 +29,14 @@ namespace CardServerControl
 
         public UdpClient receiveClient;
         public UdpClient sendClient;
-        private IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-        private int localPort = 23333;//服务端端口
-        private int remotePort = 22233;//客户端端口
+        private const int localPort = 23333;//服务端端口
+        private const int remotePort = 22233;//客户端端口
         private LogsSystem log;
         private Thread thread;
         private PacketProcess pp;//处理类
 
         public UdpServer()
-        {
+        {   
             this.receiveClient = new UdpClient(localPort);
             this.sendClient = new UdpClient();
             log = LogsSystem.Instance;
@@ -84,8 +83,12 @@ namespace CardServerControl
                 //响应
                 remoteEP.Port = remotePort;
                 byte[] response = ResponsePacket(Text, remoteEP);
-                sendClient.Send(response, response.Length, remoteEP);
-                log.Print(string.Format("[发送至{0}]{1}", remoteEP.ToString(), Encoding.UTF8.GetString(response)));
+                if (response != null)
+                {
+                    sendClient.Send(response, response.Length, remoteEP);
+                    log.Print(string.Format("[发送至{0}]{1}", remoteEP.ToString(), Encoding.UTF8.GetString(response)));
+                }
+
             }
         }
 
@@ -102,6 +105,30 @@ namespace CardServerControl
             else
             {
                 log.Print("[服务器]失败:服务器已经被关闭", LogLevel.WARN);
+            }
+        }
+
+        /// <summary>
+        /// 发送数据包到远程
+        /// </summary>
+        /// <param name="message"></param>
+        public void SendMsg(string message,string hostname, int port = remotePort)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(message);
+            sendClient.Send(bytes, bytes.Length, hostname, port);
+        }
+
+        /// <summary>
+        /// 发送数据包给固定UUID的对象
+        /// </summary>
+        public void SendToPlayerByUUID(string message, string UUID)
+        {
+            foreach (Player player in PlayerManager.Instance.GetPlayerList())
+            {
+                if (player.UUID == UUID)
+                {
+                    SendMsg(message, player.IPAddress);
+                }
             }
         }
 
@@ -127,7 +154,7 @@ namespace CardServerControl
                     returnModel = pp.LoginPacket(JsonCoding<LoginDTO>.decode(message), toIped);
                     break;
                 case SocketProtocol.CHAT:
-                    LogsSystem.Instance.Print("尚未完成聊天功能");
+                    returnModel = pp.ChatPacket(JsonCoding<ChatDTO>.decode(message));
                     break;
                 default:
                     LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);
@@ -135,7 +162,14 @@ namespace CardServerControl
             }
 
             //将model转码成二进制
-            return Encoding.UTF8.GetBytes(JsonCoding<SocketModel>.encode(returnModel));
+            if (returnModel != null)
+            {
+                return Encoding.UTF8.GetBytes(JsonCoding<SocketModel>.encode(returnModel));//返回给客户端信息
+            }
+            else
+            {
+                return null;//不返回客户端信息
+            }
         }
 
         public void SendToAllPlayer(byte[] messageByte)
