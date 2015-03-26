@@ -8,8 +8,10 @@ namespace CardServerControl.Model.DTO
 {
     class LoginDTO : CommonDTO
     {
-        public string username;
+        public string account;
         public string password;
+        public string playerName;
+        public string UUID;
 
         public LoginDTO()
             :base()
@@ -20,7 +22,7 @@ namespace CardServerControl.Model.DTO
         public LoginDTO(string username,string password)
             :base()
         {
-            this.username = username;
+            this.account = username;
             this.password = password;
         }
     }

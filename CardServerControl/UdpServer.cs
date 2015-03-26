@@ -172,6 +172,10 @@ namespace CardServerControl
             }
         }
 
+        /// <summary>
+        /// 发送给所有在线玩家
+        /// </summary>
+        /// <param name="messageByte"></param>
         public void SendToAllPlayer(byte[] messageByte)
         {
             List<Player> playerList = PlayerManager.Instance.GetPlayerList();

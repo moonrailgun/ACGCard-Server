@@ -5,7 +5,8 @@ namespace CardServerControl
 {
     class Player
     {
-        public string username;
+        public int uid;
+        public string playerName;
         public string UUID;
         public string IPAddress;
     }

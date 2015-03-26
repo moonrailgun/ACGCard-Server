@@ -9,6 +9,7 @@ namespace CardServerControl.Model.DTO
     class ChatDTO : CommonDTO
     {
         public string content;
+        public string senderName;
         public string senderUUID;
         public string toUUID;
 
@@ -18,10 +19,11 @@ namespace CardServerControl.Model.DTO
 
         }
 
-        public ChatDTO(string content, string senderUUID, string toUUID = "")
+        public ChatDTO(string content, string senderName, string senderUUID, string toUUID = "")
             : base()
         {
             this.content = content;
+            this.senderName = senderName;
             this.senderUUID = senderUUID;
             this.toUUID = toUUID;
         }

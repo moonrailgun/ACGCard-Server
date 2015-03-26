@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,10 +37,11 @@ namespace CardServerControl
             maxPlayerNumber = 20;
         }
 
-        public void PlayerLogin(string username,string UUID,string ip)
+        public void PlayerLogin(int uid, string playerName, string UUID, string ip)
         {
             Player player = new Player();
-            player.username = username;
+            player.uid = uid;
+            player.playerName = playerName;
             player.UUID = UUID;
             player.IPAddress = ip;
 
@@ -75,19 +77,94 @@ namespace CardServerControl
         /// </summary>
         public string GetPlayerNameByUUID(string uuid)
         {
+            Player player = GetPlayerByUUID(uuid);
+            if (player != null)
+            {
+                return player.playerName;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// 根据玩家姓名获取UUID
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public string GetPlayerUUIDByName(string username)
+        {
             foreach (Player player in playerList)
             {
-                if (player.UUID == uuid)
+                if (player.playerName == username)
                 {
-                    return player.username;
+                    return player.UUID;
                 }
             }
             return "";
         }
 
+        /// <summary>
+        /// 根据玩家uid获取玩家对象
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public Player GetPlayerByUid(int uid)
+        {
+            foreach (Player player in playerList)
+            {
+                if (player.uid == uid)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 根据UUID获取玩家对象
+        /// </summary>
+        public Player GetPlayerByUUID(string uuid)
+        {
+            foreach (Player player in playerList)
+            {
+                if (player.UUID == uuid)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
         public void ClearPlayerList()
         {
             playerList.Clear();
+        }
+
+        /// <summary>
+        /// 玩家登出
+        /// </summary>
+        public void PlayerLogout(int uid)
+        {
+            foreach (Player player in playerList)
+            {
+                if (player.uid == uid)
+                {
+                    string command = string.Format("UPDATE account SET UUID = '' WHERE Uid = '{0}'", uid);
+                    MySQLHelper.ExecuteNonQuery(MySQLHelper.Conn, CommandType.Text, command, null);
+                    playerList.Remove(player);
+                    return;
+                }
+            }
+        }
+        public void PlayerLogout(string uuid)
+        {
+            Player player = GetPlayerByUUID(uuid);
+            if (player != null)
+            {
+                PlayerLogout(player.uid);
+            }
         }
     }
 }

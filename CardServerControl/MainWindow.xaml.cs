@@ -6,6 +6,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Diagnostics;
 using System.Windows.Input;
+using CardServerControl.Model;
+using CardServerControl.Model.DTO;
+using CardServerControl.Util;
 
 namespace CardServerControl
 {
@@ -32,37 +35,47 @@ namespace CardServerControl
         {
             if (args[0] == "server")
             {
-                if (args[1] == "start")
-                {
-                    UdpServer.Instance.Connect();
-                }
-                else if (args[1] == "stop")
-                {
-                    UdpServer.Instance.StopListen();
-                }
+                if (args.Length == 1) { ArgNotEnough(); return; }
                 else
                 {
-                    UnkownCommand();
+                    if (args[1] == "start")
+                    {
+                        UdpServer.Instance.Connect();
+                    }
+                    else if (args[1] == "stop")
+                    {
+                        UdpServer.Instance.StopListen();
+                    }
+                    else
+                    {
+                        UnkownCommand();
+                    }
                 }
+
             }
             else if (args[0] == "log")
             {
-                if (args[1] == "open")
-                {
-                    OpenLogFile(null, new RoutedEventArgs());
-                }
-                else if (args[1] == "clear")
-                {
-                    ClearScreen(null, new RoutedEventArgs());
-                }
-                else if (args[1] == "openfolder")
-                {
-                    OpenLogFileFolder(null, new RoutedEventArgs());
-                }
+                if (args.Length == 1) { ArgNotEnough(); return; }
                 else
                 {
-                    UnkownCommand();
+                    if (args[1] == "open")
+                    {
+                        OpenLogFile(null, new RoutedEventArgs());
+                    }
+                    else if (args[1] == "clear")
+                    {
+                        ClearScreen(null, new RoutedEventArgs());
+                    }
+                    else if (args[1] == "openfolder")
+                    {
+                        OpenLogFileFolder(null, new RoutedEventArgs());
+                    }
+                    else
+                    {
+                        UnkownCommand();
+                    }
                 }
+
             }
             else if (args[0] == "list")
             {
@@ -70,20 +83,59 @@ namespace CardServerControl
             }
             else if (args[0] == "say")
             {
-                /*
-                string message = args[1];
-                if (args.Length > 2)
+                if (args.Length == 1) { ArgNotEnough(); return; }
+                else
                 {
-                    for (int i = 2; i < args.Length; i++)
+                    string message = args[1];
+                    if (args.Length > 2)
                     {
-                        message += "-" + args[i];
+                        for (int i = 2; i < args.Length; i++)
+                        {
+                            message += " " + args[i];
+                        }
                     }
-                }
-                message = string.Format("{0} chat true {1} server", .GetTimeStamp().ToString(), message);
-                UdpServer.Instance.SendToAllPlayer(Encoding.UTF8.GetBytes(message));
-                 */
 
-                logsSystem.Print("尚未完成群体聊天功能");
+                    SocketModel model = new SocketModel();
+                    model.areaCode = AreaCode.Server;
+                    model.protocol = SocketProtocol.CHAT;
+                    model.message = JsonCoding<ChatDTO>.encode(new ChatDTO(message, "Server", ""));
+                    string sendMessage = JsonCoding<SocketModel>.encode(model);
+                    UdpServer.Instance.SendToAllPlayer(Encoding.UTF8.GetBytes(sendMessage));
+
+                    logsSystem.Print("[系统公告]" + message);
+                }
+            }
+            else if (args[0] == "kick")
+            {
+                if (args.Length == 1) { ArgNotEnough(); return; }
+                else
+                {
+                    try
+                    {
+                        int playerUid = Convert.ToInt32(args[1]);
+
+                        Player player = PlayerManager.Instance.GetPlayerByUid(playerUid);
+                        if (player != null)
+                        {
+                            //玩家在线
+                            logsSystem.Print(string.Format("玩家[{0}({1})]已经被踢出了服务器", player.playerName, player.uid));
+                            PlayerManager.Instance.PlayerLogout(playerUid);
+                        }
+                        else
+                        {
+                            //玩家不存在或不在线
+                            logsSystem.Print("该玩家不存在", LogLevel.WARN);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logsSystem.Print("请输入玩家的Uid" + ex.ToString());
+                    }
+
+
+
+
+                }
             }
             else if (args[0] == "help")
             {
@@ -94,6 +146,14 @@ namespace CardServerControl
             {
                 UnkownCommand();
             }
+        }
+
+        /// <summary>
+        /// 日志打印：参数不足
+        /// </summary>
+        private void ArgNotEnough()
+        {
+            logsSystem.Print("参数不足", LogLevel.WARN);
         }
 
         /// <summary>
@@ -207,11 +267,11 @@ namespace CardServerControl
             {
                 if (listTXT == "")
                 {
-                    listTXT = player.username;
+                    listTXT = string.Format("{0}({1})", player.playerName, player.uid);
                 }
                 else
                 {
-                    listTXT += "," + player.username;
+                    listTXT += "," + string.Format("{0}({1})", player.playerName, player.uid); ;
                 }
                 i++;
             }
