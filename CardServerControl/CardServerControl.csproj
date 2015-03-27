@@ -64,6 +64,7 @@
     <Compile Include="Model\DTO\CommonDTO.cs" />
     <Compile Include="Model\DTO\ErrorDTO.cs" />
     <Compile Include="Model\DTO\LoginDTO.cs" />
+    <Compile Include="Model\DTO\PlayerInfoDTO.cs" />
     <Compile Include="Model\ErrorCode.cs" />
     <Compile Include="Model\ReturnCode.cs" />
     <Compile Include="Model\SocketModel.cs" />

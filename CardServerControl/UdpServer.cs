@@ -36,7 +36,7 @@ namespace CardServerControl
         private PacketProcess pp;//处理类
 
         public UdpServer()
-        {   
+        {
             this.receiveClient = new UdpClient(localPort);
             this.sendClient = new UdpClient();
             log = LogsSystem.Instance;
@@ -112,7 +112,7 @@ namespace CardServerControl
         /// 发送数据包到远程
         /// </summary>
         /// <param name="message"></param>
-        public void SendMsg(string message,string hostname, int port = remotePort)
+        public void SendMsg(string message, string hostname, int port = remotePort)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(message);
             sendClient.Send(bytes, bytes.Length, hostname, port);
@@ -151,14 +151,27 @@ namespace CardServerControl
             switch (protocol)
             {
                 case SocketProtocol.LOGIN:
-                    returnModel = pp.LoginPacket(JsonCoding<LoginDTO>.decode(message), toIped);
-                    break;
+                    {
+                        returnModel = pp.LoginPacket(JsonCoding<LoginDTO>.decode(message), toIped);
+                        break;
+                    }
+
                 case SocketProtocol.CHAT:
-                    returnModel = pp.ChatPacket(JsonCoding<ChatDTO>.decode(message));
-                    break;
+                    {
+                        returnModel = pp.ChatPacket(JsonCoding<ChatDTO>.decode(message));
+                        break;
+                    }
+                case SocketProtocol.PLAYERINFO:
+                    {
+                        returnModel = pp.PlayerInfoPacket(JsonCoding<PlayerInfoDTO>.decode(message));
+                        break;
+                    }
                 default:
-                    LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);
-                    break;
+                    {
+                        LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);
+                        break;
+                    }
+
             }
 
             //将model转码成二进制

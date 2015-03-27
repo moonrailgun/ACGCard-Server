@@ -41,9 +41,9 @@ namespace CardServerControl.Util
 
                     //获取该用户的uid和玩家名
                     int uid = Convert.ToInt32(ds.Tables[0].Rows[0]["Uid"]);
-                    command = string.Format("SELECT UserName FROM playerinfo WHERE Uid = '{0}'", uid);
+                    command = string.Format("SELECT PlayerName FROM playerinfo WHERE Uid = '{0}'", uid);
                     ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
-                    string playerName = ds.Tables[0].Rows[0]["UserName"].ToString();
+                    string playerName = ds.Tables[0].Rows[0]["PlayerName"].ToString();
 
                     //添加到服务器的用户列表
                     PlayerManager.Instance.PlayerLogin(uid, playerName, uuid, ip.Address.ToString());
@@ -102,6 +102,39 @@ namespace CardServerControl.Util
             }
 
             return null;//不返回数据包
+        }
+
+        /// <summary>
+        /// 处理玩家信息包
+        /// </summary>
+        public SocketModel PlayerInfoPacket(PlayerInfoDTO data)
+        {
+            string UUID = data.UUID;
+            Player senderPlayer = PlayerManager.Instance.GetPlayerByUUID(UUID);
+            int uid = senderPlayer.uid;
+
+            string command = string.Format("SELECT * FROM playerinfo WHERE Uid = '{0}'", uid);
+            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+
+            //构建返回数据包
+            SocketModel model = new SocketModel();
+            model.areaCode = AreaCode.Server;
+            model.protocol = SocketProtocol.PLAYERINFO;
+            model.returnCode = ReturnCode.Success;
+
+            PlayerInfoDTO returnData = new PlayerInfoDTO();
+            returnData.UUID = UUID;
+            returnData.uid = uid;
+            returnData.playerName = ds.Tables[0].Rows[0]["PlayerName"].ToString();
+            returnData.level = Convert.ToInt32(ds.Tables[0].Rows[0]["Level"]);
+            returnData.coin = Convert.ToInt32(ds.Tables[0].Rows[0]["Coin"]);
+            returnData.gem = Convert.ToInt32(ds.Tables[0].Rows[0]["Gem"]);
+
+            //returnData.vipExpire = DateTime.Parse(ds.Tables[0].Rows[0]["VipExpire"].ToString());
+
+            model.message = JsonCoding<PlayerInfoDTO>.encode(returnData);
+
+            return model;
         }
     }
 }

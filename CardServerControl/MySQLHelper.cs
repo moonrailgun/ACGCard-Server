@@ -10,7 +10,7 @@ namespace CardServerControl
     {
         //数据库连接字符串
         //Database='数据库名';Data Source='数据库服务器地址';User Id='数据库用户名';Password='密码'
-        public static string Conn = "Database='acgcard';Data Source='localhost';User Id='root';Password='';charset='utf8';pooling=true";
+        public static string Conn = "Database='acgcard';Data Source='localhost';User Id='root';Password='';charset='utf8';pooling=true;Allow Zero Datetime=True";
 
         // 用于缓存参数的HASH表
         private static Hashtable parmCache = Hashtable.Synchronized(new Hashtable());
