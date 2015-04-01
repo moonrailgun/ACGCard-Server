@@ -33,7 +33,8 @@ namespace CardServerControl
         private const int remotePort = 22233;//客户端端口
         private LogsSystem log;
         private Thread thread;
-        private PacketProcess pp;//处理类
+        public PacketProcess pp;//处理类
+        public CardManager cardManager;//卡片管理类
 
         public UdpServer()
         {
@@ -41,6 +42,7 @@ namespace CardServerControl
             this.sendClient = new UdpClient();
             log = LogsSystem.Instance;
             pp = new PacketProcess();
+            cardManager = new CardManager();
         }
 
         public void Connect()
@@ -155,7 +157,6 @@ namespace CardServerControl
                         returnModel = pp.LoginPacket(JsonCoding<LoginDTO>.decode(message), toIped);
                         break;
                     }
-
                 case SocketProtocol.CHAT:
                     {
                         returnModel = pp.ChatPacket(JsonCoding<ChatDTO>.decode(message));
@@ -166,12 +167,16 @@ namespace CardServerControl
                         returnModel = pp.PlayerInfoPacket(JsonCoding<PlayerInfoDTO>.decode(message));
                         break;
                     }
+                case SocketProtocol.CARDINFOLIST:
+                    {
+                        returnModel = pp.CardInfoPacket(JsonCoding<CardInfoDTO>.decode(message));
+                        break;
+                    }
                 default:
                     {
                         LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);
                         break;
                     }
-
             }
 
             //将model转码成二进制

@@ -3,6 +3,7 @@ using CardServerControl.Model.DTO;
 using System;
 using System.Data;
 using System.Net;
+using System.Collections.Generic;
 
 namespace CardServerControl.Util
 {
@@ -133,6 +134,40 @@ namespace CardServerControl.Util
             //returnData.vipExpire = DateTime.Parse(ds.Tables[0].Rows[0]["VipExpire"].ToString());
 
             model.message = JsonCoding<PlayerInfoDTO>.encode(returnData);
+
+            return model;
+        }
+
+        public SocketModel CardInfoPacket(CardInfoDTO data)
+        {
+            CardInfoDTO returnData = new CardInfoDTO();
+            List<CardInfo> cardInfoList = new List<CardInfo>();
+            int cardOwnerId = data.cardOwnerId;
+
+            //从数据库获取信息
+            string command = string.Format("SELECT * FROM cardinventory WHERE CardOwnerId = '{0}'", cardOwnerId);
+            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+
+            foreach (DataRow row in ds.Tables[0].Rows)
+            {
+                CardInfo cardInfo = new CardInfo();
+                int cardId = Convert.ToInt32(row["CardId"]);
+                cardInfo.cardId = cardId;
+                cardInfo.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
+                cardInfo.cardRarity = UdpServer.Instance.cardManager.GetRarityByCardId(cardId);
+                cardInfo.specialHealth = Convert.ToInt32(row["SpecialHealth"]);
+                cardInfo.specialMana = Convert.ToInt32(row["SpecialMana"]);
+                cardInfo.specialAttack = Convert.ToInt32(row["SpecialAttack"]);
+
+                cardInfoList.Add(cardInfo);
+            }
+            returnData.cardOwnerId = cardOwnerId;
+            returnData.cardInfoList = cardInfoList.ToArray();
+
+            SocketModel model = new SocketModel();
+            model.returnCode = ReturnCode.Success;
+            model.protocol = SocketProtocol.CARDINFOLIST;
+            model.message = JsonCoding<CardInfoDTO>.encode(returnData);
 
             return model;
         }

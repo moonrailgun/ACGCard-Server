@@ -59,7 +59,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CardManager.cs" />
     <Compile Include="Model\AreaCode.cs" />
+    <Compile Include="Model\Card.cs" />
+    <Compile Include="Model\CardInfo.cs" />
+    <Compile Include="Model\DTO\CardInfoDTO.cs" />
     <Compile Include="Model\DTO\ChatDTO.cs" />
     <Compile Include="Model\DTO\CommonDTO.cs" />
     <Compile Include="Model\DTO\ErrorDTO.cs" />
