@@ -155,6 +155,7 @@ namespace CardServerControl.Util
                 cardInfo.cardId = cardId;
                 cardInfo.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
                 cardInfo.cardRarity = UdpServer.Instance.cardManager.GetRarityByCardId(cardId);
+                cardInfo.cardName = UdpServer.Instance.cardManager.GetNameById(cardId);
                 cardInfo.specialHealth = Convert.ToInt32(row["SpecialHealth"]);
                 cardInfo.specialMana = Convert.ToInt32(row["SpecialMana"]);
                 cardInfo.specialAttack = Convert.ToInt32(row["SpecialAttack"]);

@@ -50,5 +50,17 @@ namespace CardServerControl
             }
             return 0;
         }
+
+        public string GetNameById(int cardId)
+        {
+            foreach (Card card in cardList)
+            {
+                if (card.cardId == cardId)
+                {
+                    return card.cardName;
+                }
+            }
+            return "";
+        }
     }
 }
