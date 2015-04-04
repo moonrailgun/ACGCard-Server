@@ -138,6 +138,9 @@ namespace CardServerControl.Util
             return model;
         }
 
+        /// <summary>
+        /// 处理卡片信息包
+        /// </summary>
         public SocketModel CardInfoPacket(CardInfoDTO data)
         {
             CardInfoDTO returnData = new CardInfoDTO();
