@@ -67,6 +67,7 @@
     <Compile Include="Model\DTO\ChatDTO.cs" />
     <Compile Include="Model\DTO\CommonDTO.cs" />
     <Compile Include="Model\DTO\ErrorDTO.cs" />
+    <Compile Include="Model\DTO\GameRequestDTO.cs" />
     <Compile Include="Model\DTO\LoginDTO.cs" />
     <Compile Include="Model\DTO\PlayerInfoDTO.cs" />
     <Compile Include="Model\ErrorCode.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="MySQLHelper.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerManager.cs" />
+    <Compile Include="TcpServer.cs" />
     <Compile Include="UdpServer.cs" />
     <Compile Include="Util\JsonCoding.cs" />
     <Compile Include="Util\PacketProcess.cs" />
