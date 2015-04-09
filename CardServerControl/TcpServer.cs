@@ -8,17 +8,52 @@ namespace CardServerControl
 {
     class TcpServer
     {
+        #region 单例模式
+        private static TcpServer _instance;
+        public static TcpServer Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new TcpServer();
+                }
+                return _instance;
+            }
+        }
+        #endregion
         //编码格式
-        Encoding encoding = Encoding.ASCII;
+        public static Encoding encoding = Encoding.ASCII;
+        private GameRoomManager grm;
+        public const int gamePort = 28283;
+        private TcpListener listener;
 
+        public TcpServer()
+        {
+            grm = new GameRoomManager();
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
+            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始接受TCP连接
+        }
 
+        /// <summary>
+        /// 异步接受tcp连接
+        /// </summary>
+        private void AcceptTcpClient(IAsyncResult ar)
+        {
+            TcpListener listener = (TcpListener)ar.AsyncState;
+            TcpClient client = listener.EndAcceptTcpClient(ar);
 
+            grm.AddUndistributedSocket(client.Client);
+
+            //继续下一轮接受
+            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
+        }
 
 
 
 
         #region 发送数据
-        private void Send(Socket socket, byte[] data)
+        public void Send(Socket socket, byte[] data)
         {
             LogsSystem.Instance.Print(string.Format("发送数据({0}):{1}", data.Length, encoding.GetString(data)));
             socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), socket);
@@ -40,7 +75,7 @@ namespace CardServerControl
         #endregion
 
         #region 接受数据
-        private void Receive(Socket client)
+        public void Receive(Socket client)
         {
             try
             {
@@ -101,8 +136,6 @@ namespace CardServerControl
             string message = encoding.GetString(messageBytes);
 
             //-------处理
-
-
         }
 
     }
