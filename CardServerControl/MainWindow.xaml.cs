@@ -25,7 +25,7 @@ namespace CardServerControl
 
             instance = this;
             logsSystem = LogsSystem.Instance;
-            BindShortcut();
+            BindShortcut();//绑定快捷键
         }
         /// <summary>
         /// 处理命令
@@ -41,10 +41,12 @@ namespace CardServerControl
                     if (args[1] == "start")
                     {
                         UdpServer.Instance.Connect();
+                        TcpServer.Instance.Init();
                     }
                     else if (args[1] == "stop")
                     {
                         UdpServer.Instance.StopListen();
+                        TcpServer.Instance.StopListen();
                     }
                     else
                     {

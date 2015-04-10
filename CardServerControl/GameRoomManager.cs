@@ -77,6 +77,24 @@ namespace CardServerControl
         }
 
         /// <summary>
+        /// 清空所有房间
+        /// </summary>
+        public void CloseGame()
+        {
+            //关闭未分配房间的连接
+            foreach (Socket socket in undistributedSocket)
+            {
+                socket.Close();
+            }
+            //关闭房间中的连接
+            foreach (GameRoom room in rooms)
+            {
+                room.socketA.Close();
+                room.socketB.Close();
+            }
+        }
+
+        /// <summary>
         /// 根据房间号获取房间对象
         /// </summary>
         public GameRoom GetRoom(int roomID)

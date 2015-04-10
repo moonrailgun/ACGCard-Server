@@ -26,15 +26,18 @@ namespace CardServerControl
         private string logPath;
         private string logFileName;
         private ListBox listBox;
+        private Object writeFileLock;//文件读写锁
 
         public LogsSystem()
         {
             SetLogFileInfo();
             listBox = MainWindow.instance.LogList;
+            writeFileLock = new object();
         }
 
         /// <summary>
         /// 设置文件IO的信息
+        /// 并创建文件夹
         /// logDate:日期
         /// logPath:文件夹地址
         /// logFileName:日志文件完整地址
@@ -46,6 +49,10 @@ namespace CardServerControl
                 logDate = DateTime.Now.ToString("yyyy-MM-dd");
                 logPath = Environment.CurrentDirectory + "/Logs/";
                 logFileName = logPath + logDate + ".log";
+                if (!Directory.Exists(logPath))
+                {
+                    Directory.CreateDirectory(logPath);
+                }
             }
             catch (Exception ex)
             {
@@ -77,12 +84,16 @@ namespace CardServerControl
             {
                 string log = string.Format("[{0} {1}] : {2}", DateTime.Now.ToString("HH:mm:ss"), level.ToString(), mainLog);
 
-                //写入数据
-                FileStream fs = new FileStream(logFileName, FileMode.Append);
-                StreamWriter sw = new StreamWriter(fs);
-                sw.WriteLine(log);
-                sw.Close();
-                fs.Close();
+                lock (writeFileLock)
+                {
+                    //写入数据
+                    FileStream fs = new FileStream(logFileName, FileMode.Append);
+                    StreamWriter sw = new StreamWriter(fs);
+                    sw.WriteLine(log);
+                    sw.Close();
+                    fs.Close();
+                }
+
 
                 //写入控制台
                 if (listBox != null)
@@ -128,7 +139,7 @@ namespace CardServerControl
         public string GetLogFileFolderDir()
         {
             CheckLogFileInfo();
-            return logPath.Replace(@"\\",@"\").Replace(@"/",@"\");
+            return logPath.Replace(@"\\", @"\").Replace(@"/", @"\");
         }
 
         /// <summary>

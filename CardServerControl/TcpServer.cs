@@ -28,11 +28,17 @@ namespace CardServerControl
         public const int gamePort = 28283;
         private TcpListener listener;
 
-        public TcpServer()
+        /// <summary>
+        /// 初始化TCP
+        /// </summary>
+        public void Init()
         {
+            LogsSystem.Instance.Print("正在初始化TCP服务");
             grm = new GameRoomManager();
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
-            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始接受TCP连接
+            listener.Start();
+            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始异步接受TCP连接
+            LogsSystem.Instance.Print("TCP连接创建完毕，监听端口：" + gamePort);
         }
 
         /// <summary>
@@ -40,17 +46,45 @@ namespace CardServerControl
         /// </summary>
         private void AcceptTcpClient(IAsyncResult ar)
         {
-            TcpListener listener = (TcpListener)ar.AsyncState;
-            TcpClient client = listener.EndAcceptTcpClient(ar);
+            try
+            {
+                TcpListener listener = (TcpListener)ar.AsyncState;
+                if (listener.Server.Connected)//如果监听器有效
+                {
+                    TcpClient client = listener.EndAcceptTcpClient(ar);
 
-            grm.AddUndistributedSocket(client.Client);
+                    grm.AddUndistributedSocket(client.Client);
 
-            //继续下一轮接受
-            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
+                    //继续下一轮接受
+                    listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogsSystem.Instance.Print(ex.ToString(), LogLevel.ERROR);
+            }
+
         }
 
-
-
+        /// <summary>
+        /// 关闭监听
+        /// </summary>
+        public void StopListen()
+        {
+            if (listener != null)
+            {
+                try
+                {
+                    listener.Stop();
+                    grm.CloseGame();//关闭连接
+                    LogsSystem.Instance.Print("已关闭TCP服务");
+                }
+                catch (Exception ex)
+                {
+                    LogsSystem.Instance.Print("关闭TCP失败" + ex, LogLevel.ERROR);
+                }
+            }
+        }
 
         #region 发送数据
         public void Send(Socket socket, byte[] data)
