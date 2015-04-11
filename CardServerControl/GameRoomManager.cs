@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using CardServerControl.Model.DTO;
+using CardServerControl.Model.DTO.GameData;
 
 namespace CardServerControl
 {
@@ -13,7 +14,8 @@ namespace CardServerControl
         public List<GameRoom> rooms;
         private int availableRoomID;
         //public List<GameRequestDTO> undistributedRequest;
-        public List<Socket> undistributedSocket;
+        public List<Socket> unknownSocket;
+        public List<PlayerSocket> freedomPlayer;
 
         public GameRoomManager()
         {
@@ -24,15 +26,14 @@ namespace CardServerControl
         /// <summary>
         /// 创建房间
         /// </summary>
-        public GameRoom CreateRoom(Socket socketA, Socket socketB)
+        public GameRoom CreateRoom(PlayerSocket playerSocketA, PlayerSocket playerSocketB)
         {
-            GameRoom newroom = new GameRoom(availableRoomID, socketA, socketB);
+            GameRoom newroom = new GameRoom(availableRoomID, playerSocketA, playerSocketB);
             rooms.Add(newroom);
             availableRoomID++;
 
             //发送数据
             //--内容是分配到的房间ID,对手信息等数据
-            
 
             return newroom;
         }
@@ -51,28 +52,27 @@ namespace CardServerControl
         /// 把socket连接添加到房间
         /// </summary>
         /// <param name="socket"></param>
-        public void AddUndistributedSocket(Socket socket)
+        public void AddUnknownSocket(Socket socket)
         {
-            undistributedSocket.Add(socket);
-            TryDistributeRoom();
+            unknownSocket.Add(socket);//添加未知的连接
         }
 
         /// <summary>
         /// 分配房间
         /// </summary>
-        private void TryDistributeRoom()
+        private void TryAllocRoom()
         {
-            if (undistributedSocket.Count >= 2)
+            if (unknownSocket.Count >= 2)
             {
-                Socket socketA, socketB;
+                PlayerSocket playerSocketA, playerSocketB;
 
                 //简单匹配，之后修改
-                socketA = undistributedSocket[0];
-                socketB = undistributedSocket[1];
-                undistributedSocket.Remove(socketA);
-                undistributedSocket.Remove(socketB);
+                playerSocketA = freedomPlayer[0];
+                playerSocketB = freedomPlayer[1];
+                freedomPlayer.Remove(playerSocketA);
+                freedomPlayer.Remove(playerSocketB);
 
-                CreateRoom(socketA, socketB);//创建房间
+                CreateRoom(playerSocketA, playerSocketB);//创建房间
             }
         }
 
@@ -81,17 +81,27 @@ namespace CardServerControl
         /// </summary>
         public void CloseGame()
         {
-            //关闭未分配房间的连接
-            foreach (Socket socket in undistributedSocket)
+            //关闭未知房间的连接
+            foreach (Socket socket in unknownSocket)
             {
                 socket.Close();
             }
+            unknownSocket.Clear();
+
+            //关闭自由玩家连接
+            foreach (PlayerSocket playerSocket in freedomPlayer)
+            {
+                playerSocket.socket.Close();
+            }
+            freedomPlayer.Clear();
+
             //关闭房间中的连接
             foreach (GameRoom room in rooms)
             {
                 room.socketA.Close();
                 room.socketB.Close();
             }
+            rooms.Clear();
         }
 
         /// <summary>
@@ -107,6 +117,24 @@ namespace CardServerControl
                 }
             }
             return null;
+        }
+
+        public void BindSocket(PlayerInfoData playerInfo, Socket socket)
+        {
+            try
+            {
+                int index = unknownSocket.IndexOf(socket);
+                //添加到已绑定的socket列表
+                PlayerSocket playerSocket = new PlayerSocket(playerInfo, socket);
+                freedomPlayer.Add(playerSocket);
+
+                //从未知连接列表中删除
+                unknownSocket.Remove(socket);
+            }
+            catch(Exception ex)
+            {
+                LogsSystem.Instance.Print("绑定连接失败，可能是不存在该连接:"+ex.ToString(),LogLevel.WARN);
+            }
         }
     }
 }

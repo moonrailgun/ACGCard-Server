@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using CardServerControl.Model.DTO;
+using CardServerControl.Util;
 
 namespace CardServerControl
 {
@@ -23,8 +25,9 @@ namespace CardServerControl
         }
         #endregion
         //编码格式
-        public static Encoding encoding = Encoding.ASCII;
+        public static Encoding encoding = Encoding.UTF8;
         private GameRoomManager grm;
+        private TCPDataHandler tcpDH;
         public const int gamePort = 28283;
         private TcpListener listener;
 
@@ -35,6 +38,7 @@ namespace CardServerControl
         {
             LogsSystem.Instance.Print("正在初始化TCP服务");
             grm = new GameRoomManager();
+            tcpDH = new TCPDataHandler();
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
             listener.Start();
             listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始异步接受TCP连接
@@ -53,7 +57,11 @@ namespace CardServerControl
                 {
                     TcpClient client = listener.EndAcceptTcpClient(ar);
 
-                    grm.AddUndistributedSocket(client.Client);
+                    //开始异步接受数据
+                    Receive(client.Client);
+
+                    //加入未知连接队列
+                    grm.AddUnknownSocket(client.Client);
 
                     //继续下一轮接受
                     listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
@@ -84,6 +92,14 @@ namespace CardServerControl
                     LogsSystem.Instance.Print("关闭TCP失败" + ex, LogLevel.ERROR);
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取游戏房间管理器
+        /// </summary>
+        public GameRoomManager GetGameRoomManager()
+        {
+            return this.grm;
         }
 
         #region 发送数据
@@ -157,7 +173,6 @@ namespace CardServerControl
                 LogsSystem.Instance.Print(e.ToString(), LogLevel.ERROR);
             }
         }
-        #endregion
 
         /// <summary>
         /// 处理接受到的数据
@@ -169,9 +184,16 @@ namespace CardServerControl
             //获取收到的数据
             string message = encoding.GetString(messageBytes);
 
-            //-------处理
+            //转换数据
+            GameDataDTO data = JsonCoding<GameDataDTO>.decode(message);
+            GameDataDTO returnData = tcpDH.ProcessTcpData(data.operateCode, data.operateData, socket);
+            if (returnData != null)
+            {
+                string returnMessage = JsonCoding<GameDataDTO>.encode(returnData);
+                Send(socket, encoding.GetBytes(returnMessage));
+            }
         }
-
+        #endregion
     }
 
     class StateObject

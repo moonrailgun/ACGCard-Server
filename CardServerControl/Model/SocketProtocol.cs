@@ -14,5 +14,6 @@ namespace CardServerControl.Model
         public const int PLAYERINFO = 12;
         public const int CARDINFOLIST = 13;
         public const int GAME = 14;
+        public const int GAMEDATA = 15;
     }
 }
