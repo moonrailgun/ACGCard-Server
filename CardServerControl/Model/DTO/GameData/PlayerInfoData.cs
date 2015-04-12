@@ -10,6 +10,6 @@ namespace CardServerControl.Model.DTO.GameData
     {
         public string playerUUID;
         public int playerUid;
-        public strin playerName;
+        public string playerName;
     }
 }

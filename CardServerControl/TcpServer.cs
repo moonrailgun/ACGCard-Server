@@ -52,20 +52,19 @@ namespace CardServerControl
         {
             try
             {
+                LogsSystem.Instance.Print("有新的连接连入");
                 TcpListener listener = (TcpListener)ar.AsyncState;
-                if (listener.Server.Connected)//如果监听器有效
-                {
-                    TcpClient client = listener.EndAcceptTcpClient(ar);
 
-                    //开始异步接受数据
-                    Receive(client.Client);
+                TcpClient client = listener.EndAcceptTcpClient(ar);
 
-                    //加入未知连接队列
-                    grm.AddUnknownSocket(client.Client);
+                //开始异步接受数据
+                Receive(client.Client);
 
-                    //继续下一轮接受
-                    listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
-                }
+                //加入未知连接队列
+                grm.AddUnknownSocket(client.Client);
+
+                //继续下一轮接受
+                listener.BeginAcceptTcpClient(AcceptTcpClient, listener);
             }
             catch (Exception ex)
             {
@@ -103,7 +102,7 @@ namespace CardServerControl
         }
 
         #region 发送数据
-        public void Send(Socket socket,GameDataDTO data)
+        public void Send(Socket socket, GameDataDTO data)
         {
             string sendMessage = JsonCoding<GameDataDTO>.encode(data);
             byte[] sendBytes = encoding.GetBytes(sendMessage);
@@ -155,14 +154,20 @@ namespace CardServerControl
                 if (bytesRead < StateObject.buffSize)
                 {
                     //如果读取到数据长度较小
-                    receiveState.dataByte.AddRange(receiveState.buffer);//将缓存加入结果列
+                    foreach (byte b in receiveState.buffer)
+                    {
+                        if (b != 0x00)
+                        {
+                            //将缓存加入结果列
+                            receiveState.dataByte.Add(b);
+                        }
+                    }
                     receiveState.buffer = new byte[StateObject.buffSize];//清空缓存
 
                     //接受完成
-                    byte[] receiveData = receiveState.dataByte.ToArray();
-                    LogsSystem.Instance.Print(string.Format("接受到{0}字节数据", receiveData.Length));
+                    byte[] receiveBytes = receiveState.dataByte.ToArray();
                     //处理数据
-                    ProcessReceiveMessage(receiveData, client.LocalEndPoint, receiveState.socket);
+                    ProcessReceiveMessage(receiveBytes, receiveState.socket);
 
                     Receive(client);//继续下一轮的接受
                 }
@@ -185,10 +190,11 @@ namespace CardServerControl
         /// </summary>
         /// <param name="message">接收到的数据</param>
         /// <param name="fromPort">接受的本地端口</param>
-        private void ProcessReceiveMessage(byte[] messageBytes, EndPoint localEndPoint, Socket socket)
+        private void ProcessReceiveMessage(byte[] messageBytes, Socket socket)
         {
             //获取收到的数据
             string message = encoding.GetString(messageBytes);
+            LogsSystem.Instance.Print(string.Format("[FROM {0}]:{1}", socket.RemoteEndPoint, message));
 
             //转换数据
             GameDataDTO data = JsonCoding<GameDataDTO>.decode(message);

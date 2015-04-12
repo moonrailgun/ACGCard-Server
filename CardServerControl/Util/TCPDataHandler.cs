@@ -1,9 +1,9 @@
-﻿using CardServerControl.Util;
+﻿using CardServerControl.Model;
 using CardServerControl.Model.DTO;
 using CardServerControl.Model.DTO.GameData;
-using System.Net.Sockets;
-using System.Data;
 using System;
+using System.Data;
+using System.Net.Sockets;
 
 namespace CardServerControl.Util
 {
@@ -19,7 +19,7 @@ namespace CardServerControl.Util
         {
             switch (operateCode)
             {
-                case GameDataDTO.OperateCode.Identify:
+                case OperateCode.Identify:
                     {
                         string UUID = operateData;
                         return ProcessIdentify(UUID, socket);
@@ -52,7 +52,7 @@ namespace CardServerControl.Util
                     //获取玩家名字
                     command = string.Format("SELECT * FROM playerinfo WHERE Uid = '{0}'", uid);
                     ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
-                    playerInfo.playerName = ds.Tables[0].Rows[0]["PlayerName"];
+                    playerInfo.playerName = ds.Tables[0].Rows[0]["PlayerName"].ToString();
 
                     //绑定
                     TcpServer.Instance.GetGameRoomManager().BindSocket(playerInfo, socket);

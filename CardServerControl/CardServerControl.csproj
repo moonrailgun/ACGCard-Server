@@ -97,6 +97,7 @@
     <Compile Include="Model\DTO\LoginDTO.cs" />
     <Compile Include="Model\DTO\PlayerInfoDTO.cs" />
     <Compile Include="Model\ErrorCode.cs" />
+    <Compile Include="Model\OperateCode.cs" />
     <Compile Include="Model\ReturnCode.cs" />
     <Compile Include="Model\SocketModel.cs" />
     <Compile Include="Model\SocketProtocol.cs" />

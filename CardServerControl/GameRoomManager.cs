@@ -22,6 +22,8 @@ namespace CardServerControl
         public GameRoomManager()
         {
             rooms = new List<GameRoom>();
+            unknownSocket = new List<Socket>();
+            freedomPlayer = new List<PlayerSocket>();
             availableRoomID = 0;
         }
 
@@ -62,7 +64,7 @@ namespace CardServerControl
             GameDataDTO data = new GameDataDTO();
             data.roomID = -1;
             data.returnCode = ReturnCode.Request;
-            data.operateCode = GameDataDTO.OperateCode.Identify;
+            data.operateCode = OperateCode.Identify;
 
             TcpServer.Instance.Send(socket, data);
         }
@@ -92,26 +94,35 @@ namespace CardServerControl
         public void CloseGame()
         {
             //关闭未知房间的连接
-            foreach (Socket socket in unknownSocket)
+            if (unknownSocket.Count > 0)
             {
-                socket.Close();
+                foreach (Socket socket in unknownSocket)
+                {
+                    socket.Close();
+                }
+                unknownSocket.Clear();
             }
-            unknownSocket.Clear();
 
             //关闭自由玩家连接
-            foreach (PlayerSocket playerSocket in freedomPlayer)
+            if (freedomPlayer.Count > 0)
             {
-                playerSocket.socket.Close();
+                foreach (PlayerSocket playerSocket in freedomPlayer)
+                {
+                    playerSocket.socket.Close();
+                }
+                freedomPlayer.Clear();
             }
-            freedomPlayer.Clear();
 
             //关闭房间中的连接
-            foreach (GameRoom room in rooms)
+            if (rooms.Count > 0)
             {
-                room.socketA.Close();
-                room.socketB.Close();
+                foreach (GameRoom room in rooms)
+                {
+                    room.playerSocketA.socket.Close();
+                    room.playerSocketB.socket.Close();
+                }
+                rooms.Clear();
             }
-            rooms.Clear();
         }
 
         /// <summary>
@@ -140,10 +151,13 @@ namespace CardServerControl
 
                 //从未知连接列表中删除
                 unknownSocket.Remove(socket);
+
+                //日志记录
+                LogsSystem.Instance.Print(string.Format("绑定成功[{0},{1}]", playerInfo.playerName, socket.RemoteEndPoint.ToString()));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LogsSystem.Instance.Print("绑定连接失败，可能是不存在该连接:"+ex.ToString(),LogLevel.WARN);
+                LogsSystem.Instance.Print("绑定连接失败，可能是不存在该连接:" + ex.ToString(), LogLevel.WARN);
             }
         }
     }

@@ -26,6 +26,13 @@ namespace CardServerControl
             instance = this;
             logsSystem = LogsSystem.Instance;
             BindShortcut();//绑定快捷键
+
+            //---实验
+            /*
+            string a = "{\"roomID\":-1,\"returnCode\":1,\"operateCode\":99,\"operateData\":\"\",\"timestamp\":\"1428826799101\"}";
+            GameDataDTO data = JsonCoding<GameDataDTO>.decode(a);
+            logsSystem.Print(data.roomID.ToString());
+            */
         }
         /// <summary>
         /// 处理命令
