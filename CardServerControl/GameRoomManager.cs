@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using CardServerControl.Model;
 using CardServerControl.Model.DTO;
 using CardServerControl.Model.DTO.GameData;
+using CardServerControl.Util;
 
 namespace CardServerControl
 {
@@ -55,6 +57,14 @@ namespace CardServerControl
         public void AddUnknownSocket(Socket socket)
         {
             unknownSocket.Add(socket);//添加未知的连接
+
+            //发送请求身份验证
+            GameDataDTO data = new GameDataDTO();
+            data.roomID = -1;
+            data.returnCode = ReturnCode.Request;
+            data.operateCode = GameDataDTO.OperateCode.Identify;
+
+            TcpServer.Instance.Send(socket, data);
         }
 
         /// <summary>

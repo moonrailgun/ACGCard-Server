@@ -103,6 +103,12 @@ namespace CardServerControl
         }
 
         #region 发送数据
+        public void Send(Socket socket,GameDataDTO data)
+        {
+            string sendMessage = JsonCoding<GameDataDTO>.encode(data);
+            byte[] sendBytes = encoding.GetBytes(sendMessage);
+            Send(socket, sendBytes);
+        }
         public void Send(Socket socket, byte[] data)
         {
             LogsSystem.Instance.Print(string.Format("发送数据({0}):{1}", data.Length, encoding.GetString(data)));

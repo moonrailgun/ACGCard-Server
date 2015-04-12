@@ -11,6 +11,7 @@ namespace CardServerControl.Model.DTO
     class GameDataDTO
     {
         public int roomID;//房间名
+        public int returnCode;//返回值
         public int operateCode;//游戏操作名
         public string operateData;//操作数据
 
