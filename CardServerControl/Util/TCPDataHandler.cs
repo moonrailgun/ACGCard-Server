@@ -2,6 +2,8 @@
 using CardServerControl.Model.DTO;
 using CardServerControl.Model.DTO.GameData;
 using System.Net.Sockets;
+using System.Data;
+using System;
 
 namespace CardServerControl.Util
 {
@@ -13,14 +15,14 @@ namespace CardServerControl.Util
         /// 并返回相应
         /// 如果返回null则不发送
         /// </summary>
-        public GameDataDTO ProcessTcpData(int operateCode, string operateData,Socket socket)
+        public GameDataDTO ProcessTcpData(int operateCode, string operateData, Socket socket)
         {
             switch (operateCode)
             {
                 case GameDataDTO.OperateCode.Identify:
                     {
-                        PlayerInfoData info = JsonCoding<PlayerInfoData>.decode(operateData);
-                        return ProcessIdentify(info, socket);
+                        string UUID = operateData;
+                        return ProcessIdentify(UUID, socket);
                     }
                 default:
                     {
@@ -29,12 +31,41 @@ namespace CardServerControl.Util
             }
             return null;
         }
-
-        private GameDataDTO ProcessIdentify(PlayerInfoData data,Socket socket)
+        /// <summary>
+        /// 身份验证处理
+        /// </summary>
+        private GameDataDTO ProcessIdentify(string uuid, Socket socket)
         {
-            //将数据和socket绑定
-            TcpServer.Instance.GetGameRoomManager().BindSocket(data, socket);
+            try
+            {
+                PlayerInfoData playerInfo = new PlayerInfoData();
+                playerInfo.playerUUID = uuid;
 
+                string command = string.Format("SELECT * FROM account WHERE UUID = '{0}'", uuid);
+                DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+                if (ds.Tables[0].Rows.Count > 0)//UUID验证通过
+                {
+                    //获取UID
+                    int uid = Convert.ToInt32(ds.Tables[0].Rows[0]["Uid"]);
+                    playerInfo.playerUid = uid;
+
+                    //获取玩家名字
+                    command = string.Format("SELECT * FROM playerinfo WHERE Uid = '{0}'", uid);
+                    ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+                    playerInfo.playerName = ds.Tables[0].Rows[0]["PlayerName"];
+
+                    //绑定
+                    TcpServer.Instance.GetGameRoomManager().BindSocket(playerInfo, socket);
+                }
+                else
+                {
+                    LogsSystem.Instance.Print("未知的UUID试图绑定连接", LogLevel.WARN);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogsSystem.Instance.Print("发生异常" + ex.ToString(), LogLevel.ERROR);
+            }
             return null;
         }
     }
