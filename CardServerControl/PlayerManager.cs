@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 /*
  * TODO
@@ -37,13 +38,13 @@ namespace CardServerControl
             maxPlayerNumber = 20;
         }
 
-        public void PlayerLogin(int uid, string playerName, string UUID, string ip)
+        public void PlayerLogin(int uid, string playerName, string UUID, IPEndPoint iped)
         {
             Player player = new Player();
             player.uid = uid;
             player.playerName = playerName;
             player.UUID = UUID;
-            player.IPAddress = ip;
+            player.IPed = iped;
 
             this.playerList.Add(player);
         }

@@ -13,9 +13,9 @@ namespace CardServerControl.Util
         /// 处理登陆包
         /// </summary>
         /// <param name="data">登陆数据</param>
-        /// <param name="ip">发送的ip</param>
+        /// <param name="iped">发送的ip</param>
         /// <returns>返回封包</returns>
-        public SocketModel LoginPacket(LoginDTO data, IPEndPoint ip)
+        public SocketModel LoginPacket(LoginDTO data, IPEndPoint iped)
         {
             SocketModel model = new SocketModel();
             model.areaCode = AreaCode.Server;
@@ -33,7 +33,7 @@ namespace CardServerControl.Util
                 if (ds.Tables[0].Rows.Count == 1)
                 {
                     //登陆成功
-                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]已登录到系统", account, ip.Address.ToString()));
+                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]已登录到系统", account, iped.Address.ToString()));
 
                     //为数据表创建uuid并写入
                     string uuid = System.Guid.NewGuid().ToString();
@@ -47,7 +47,7 @@ namespace CardServerControl.Util
                     string playerName = ds.Tables[0].Rows[0]["PlayerName"].ToString();
 
                     //添加到服务器的用户列表
-                    PlayerManager.Instance.PlayerLogin(uid, playerName, uuid, ip.Address.ToString());
+                    PlayerManager.Instance.PlayerLogin(uid, playerName, uuid, iped);
 
                     //构造返回数据
                     model.returnCode = ReturnCode.Success;
@@ -61,7 +61,7 @@ namespace CardServerControl.Util
                 else
                 {
                     //登陆失败
-                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]试图登陆游戏失败：用户名或密码错误", account, ip.Address.ToString()));
+                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]试图登陆游戏失败：用户名或密码错误", account, iped.Address.ToString()));
                     model.message = JsonCoding<LoginDTO>.encode(data);
                     model.returnCode = ReturnCode.Failed;
                 }
@@ -69,7 +69,7 @@ namespace CardServerControl.Util
             else
             {
                 //服务器已满
-                LogsSystem.Instance.Print(string.Format("账户{0}[{1}]试图登陆游戏失败：服务器已满", account, ip.Address.ToString()));
+                LogsSystem.Instance.Print(string.Format("账户{0}[{1}]试图登陆游戏失败：服务器已满", account, iped.Address.ToString()));
                 model.message = JsonCoding<LoginDTO>.encode(data);
                 model.returnCode = ReturnCode.Refuse;
             }

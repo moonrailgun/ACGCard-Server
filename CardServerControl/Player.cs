@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace CardServerControl
 {
@@ -8,6 +9,6 @@ namespace CardServerControl
         public int uid;
         public string playerName;
         public string UUID;
-        public string IPAddress;
+        public IPEndPoint IPed;
     }
 }

@@ -30,7 +30,7 @@ namespace CardServerControl
         public UdpClient receiveClient;
         public UdpClient sendClient;
         private const int localPort = 23333;//服务端端口
-        private const int remotePort = 22233;//客户端端口
+        private const int remotePort = 22233;//客户端默认端口
         private LogsSystem log;
         private Thread thread;
         public PacketProcess pp;//处理类
@@ -82,8 +82,7 @@ namespace CardServerControl
                 string Text = Encoding.UTF8.GetString(receivedInf);
                 log.Print(string.Format("[远程{0}]{1}", remoteEP.ToString(), Text));
 
-                //响应
-                remoteEP.Port = remotePort;
+                //响应，根据发送的端口返回
                 byte[] response = ResponsePacket(Text, remoteEP);
                 if (response != null)
                 {
@@ -129,7 +128,7 @@ namespace CardServerControl
             {
                 if (player.UUID == UUID)
                 {
-                    SendMsg(message, player.IPAddress);
+                    SendMsg(message, player.IPed.Address.ToString(),player.IPed.Port);
                 }
             }
         }
@@ -200,7 +199,7 @@ namespace CardServerControl
             foreach (Player player in playerList)
             {
                 //-------------------------------注意这里是同步发送所以后期可能需要修改
-                sendClient.Send(messageByte, messageByte.Length, player.IPAddress, remotePort);
+                sendClient.Send(messageByte, messageByte.Length, player.IPed.Address.ToString(), player.IPed.Port);
             }
         }
     }
