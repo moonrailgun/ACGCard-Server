@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using CardServerControl.Model.DTO;
 using CardServerControl.Util;
+using CardServerControl.Model.DTO.GameData;
 
 namespace CardServerControl
 {
@@ -102,9 +102,9 @@ namespace CardServerControl
         }
 
         #region 发送数据
-        public void Send(Socket socket, GameDataDTO data)
+        public void Send(Socket socket, GameData data)
         {
-            string sendMessage = JsonCoding<GameDataDTO>.encode(data);
+            string sendMessage = JsonCoding<GameData>.encode(data);
             byte[] sendBytes = encoding.GetBytes(sendMessage);
             Send(socket, sendBytes);
         }
@@ -197,11 +197,11 @@ namespace CardServerControl
             LogsSystem.Instance.Print(string.Format("[FROM {0}]:{1}", socket.RemoteEndPoint, message));
 
             //转换数据
-            GameDataDTO data = JsonCoding<GameDataDTO>.decode(message);
-            GameDataDTO returnData = tcpDH.ProcessTcpData(data.operateCode, data.operateData, socket);
+            GameData data = JsonCoding<GameData>.decode(message);
+            GameData returnData = tcpDH.ProcessTcpData(data.operateCode, data.operateData, socket);
             if (returnData != null)
             {
-                string returnMessage = JsonCoding<GameDataDTO>.encode(returnData);
+                string returnMessage = JsonCoding<GameData>.encode(returnData);
                 Send(socket, encoding.GetBytes(returnMessage));
             }
         }

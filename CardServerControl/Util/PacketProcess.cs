@@ -175,22 +175,5 @@ namespace CardServerControl.Util
 
             return model;
         }
-
-        public SocketModel GameRequestPacket(GameRequestDTO data, int returnCode)
-        {
-            if (returnCode == ReturnCode.Success)
-            {
-                //请求匹配
-
-            }
-            else if (returnCode == ReturnCode.Repeal)
-            {
-                //取消匹配
-
-            }
-
-
-            return null;
-        }
     }
 }

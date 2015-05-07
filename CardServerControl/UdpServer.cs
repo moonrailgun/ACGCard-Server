@@ -172,11 +172,6 @@ namespace CardServerControl
                         returnModel = pp.CardInfoPacket(JsonCoding<CardInfoDTO>.decode(message));
                         break;
                     }
-                case SocketProtocol.GAME:
-                    {
-                        returnModel = pp.GameRequestPacket(JsonCoding<GameRequestDTO>.decode(message), returncode);
-                        break;
-                    }
                 default:
                     {
                         LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);

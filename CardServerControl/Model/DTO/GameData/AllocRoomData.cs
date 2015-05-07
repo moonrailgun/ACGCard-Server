@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardServerControl.Model.DTO.GameData
 {
-    class AllocRoomData
+    class AllocRoomData :CommonDTO
     {
         public int roomID;
         public int allocPosition;

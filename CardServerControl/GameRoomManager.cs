@@ -32,12 +32,42 @@ namespace CardServerControl
         /// </summary>
         public GameRoom CreateRoom(PlayerSocket playerSocketA, PlayerSocket playerSocketB)
         {
-            GameRoom newroom = new GameRoom(availableRoomID, playerSocketA, playerSocketB);
+            int roomID = availableRoomID;
+            GameRoom newroom = new GameRoom(roomID, playerSocketA, playerSocketB);
             rooms.Add(newroom);
             availableRoomID++;
 
-            //发送数据
-            //--内容是分配到的房间ID,对手信息等数据
+            //发送数据,让客户端建立房间
+            //通用数据
+            GameData data = new GameData();
+            data.operateCode = OperateCode.AllocRoom;
+            data.returnCode = ReturnCode.Success;
+
+            //对playerA发送的信息
+            AllocRoomData roomDataToPlayerA = new AllocRoomData();
+            roomDataToPlayerA.roomID = roomID;
+            roomDataToPlayerA.allocPosition = AllocRoomData.Position.A;
+            roomDataToPlayerA.rivalName = playerSocketB.playerInfo.playerName;
+            roomDataToPlayerA.rivalUid = playerSocketB.playerInfo.playerUid;
+            roomDataToPlayerA.rivalUUID = playerSocketB.playerInfo.playerUUID;
+            string messageToA = JsonCoding<AllocRoomData>.encode(roomDataToPlayerA);
+
+            //对playerB发送的信息
+            AllocRoomData roomDataToPlayerB = new AllocRoomData();
+            roomDataToPlayerB.roomID = roomID;
+            roomDataToPlayerB.allocPosition = AllocRoomData.Position.B;
+            roomDataToPlayerB.rivalName = playerSocketA.playerInfo.playerName;
+            roomDataToPlayerB.rivalUid = playerSocketA.playerInfo.playerUid;
+            roomDataToPlayerB.rivalUUID = playerSocketA.playerInfo.playerUUID;
+            string messageToB = JsonCoding<AllocRoomData>.encode(roomDataToPlayerB);
+
+            //对A发送信息
+            data.operateData = messageToA;
+            TcpServer.Instance.Send(playerSocketA.socket,data);
+
+            //对B发送信息
+            data.operateData = messageToB;
+            TcpServer.Instance.Send(playerSocketB.socket, data);
 
             return newroom;
         }
@@ -61,7 +91,7 @@ namespace CardServerControl
             unknownSocket.Add(socket);//添加未知的连接
 
             //发送请求身份验证
-            GameDataDTO data = new GameDataDTO();
+            GameData data = new GameData();
             data.roomID = -1;
             data.returnCode = ReturnCode.Request;
             data.operateCode = OperateCode.Identify;
@@ -140,6 +170,9 @@ namespace CardServerControl
             return null;
         }
 
+        /// <summary>
+        /// 绑定连接
+        /// </summary>
         public void BindSocket(PlayerInfoData playerInfo, Socket socket)
         {
             try
@@ -154,6 +187,9 @@ namespace CardServerControl
 
                 //日志记录
                 LogsSystem.Instance.Print(string.Format("绑定成功[{0},{1}]", playerInfo.playerName, socket.RemoteEndPoint.ToString()));
+
+                //绑定后尝试分配房间
+                TryAllocRoom();
             }
             catch (Exception ex)
             {

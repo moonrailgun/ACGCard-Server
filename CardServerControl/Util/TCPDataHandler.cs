@@ -15,7 +15,7 @@ namespace CardServerControl.Util
         /// 并返回相应
         /// 如果返回null则不发送
         /// </summary>
-        public GameDataDTO ProcessTcpData(int operateCode, string operateData, Socket socket)
+        public GameData ProcessTcpData(int operateCode, string operateData, Socket socket)
         {
             switch (operateCode)
             {
@@ -32,9 +32,10 @@ namespace CardServerControl.Util
             return null;
         }
         /// <summary>
+        /// 根据UUID做
         /// 身份验证处理
         /// </summary>
-        private GameDataDTO ProcessIdentify(string uuid, Socket socket)
+        private GameData ProcessIdentify(string uuid, Socket socket)
         {
             try
             {

@@ -1,5 +1,9 @@
 ﻿namespace CardServerControl.Model
 {
+    /// <summary>
+    /// TCP用协议
+    /// 传输协议
+    /// </summary>
     public class OperateCode
     {
         public const int Identify = 99;

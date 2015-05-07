@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace CardServerControl.Model.DTO.GameData
 {
-    class UseSkillData
+    class UseSkillData : CommonDTO
     {
+        public UseSkillData()
+            : base()
+        { }
     }
 }
