@@ -69,6 +69,8 @@ namespace CardServerControl
             data.operateData = messageToB;
             TcpServer.Instance.Send(playerSocketB.socket, data);
 
+            LogsSystem.Instance.Print(string.Format("房间{0}创建完毕；对战玩家[{1},{2}]", roomID, playerSocketA.playerInfo.playerName, playerSocketB.playerInfo.playerName));
+
             return newroom;
         }
 
@@ -104,7 +106,8 @@ namespace CardServerControl
         /// </summary>
         private void TryAllocRoom()
         {
-            if (unknownSocket.Count >= 2)
+            LogsSystem.Instance.Print("尝试分配房间,当前等待人数:" + freedomPlayer.Count);
+            if (freedomPlayer.Count >= 2)
             {
                 PlayerSocket playerSocketA, playerSocketB;
 

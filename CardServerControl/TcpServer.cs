@@ -36,13 +36,21 @@ namespace CardServerControl
         /// </summary>
         public void Init()
         {
-            LogsSystem.Instance.Print("正在初始化TCP服务");
-            grm = new GameRoomManager();
-            tcpDH = new TCPDataHandler();
-            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
-            listener.Start();
-            listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始异步接受TCP连接
-            LogsSystem.Instance.Print("TCP连接创建完毕，监听端口：" + gamePort);
+            try
+            {
+                LogsSystem.Instance.Print("正在初始化TCP服务");
+                grm = new GameRoomManager();
+                tcpDH = new TCPDataHandler();
+                listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
+                listener.Start();
+                listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始异步接受TCP连接
+                LogsSystem.Instance.Print("TCP连接创建完毕，监听端口：" + gamePort);
+            }
+            catch (Exception ex)
+            {
+                LogsSystem.Instance.Print("TCP服务创建失败：" + ex.ToString(), LogLevel.ERROR);
+            }
+            
         }
 
         /// <summary>
