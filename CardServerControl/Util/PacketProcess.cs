@@ -10,6 +10,23 @@ namespace CardServerControl.Util
     class PacketProcess
     {
         /// <summary>
+        /// 检查UUID的合法性
+        /// </summary>
+        private bool CheckUUID(string uuid)
+        {
+            string command = string.Format("SELECT * FROM account WHERE UUID = '{0}'", uuid);
+            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+            if (ds.Tables[0].Rows.Count > 0)//UUID验证通过
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 处理登陆包
         /// </summary>
         /// <param name="data">登陆数据</param>
@@ -32,9 +49,6 @@ namespace CardServerControl.Util
 
                 if (ds.Tables[0].Rows.Count == 1)
                 {
-                    //登陆成功
-                    LogsSystem.Instance.Print(string.Format("账户{0}[{1}]已登录到系统", account, iped.Address.ToString()));
-
                     //为数据表创建uuid并写入
                     string uuid = System.Guid.NewGuid().ToString();
                     command = string.Format("UPDATE account SET UUID = '{0}',LastLogin = '{1}' WHERE Account = '{2}' AND Password = '{3}'", uuid, CommonDTO.GetTimeStamp().ToString(), account, password);
@@ -47,7 +61,7 @@ namespace CardServerControl.Util
                     string playerName = ds.Tables[0].Rows[0]["PlayerName"].ToString();
 
                     //添加到服务器的用户列表
-                    PlayerManager.Instance.PlayerLogin(uid, playerName, uuid, iped);
+                    PlayerManager.Instance.PlayerLoginLobby(uid, playerName, uuid, iped);
 
                     //构造返回数据
                     model.returnCode = ReturnCode.Success;
@@ -89,7 +103,14 @@ namespace CardServerControl.Util
             string senderUUID = data.senderUUID;
             string toUUID = data.toUUID;
 
-            foreach (Player player in PlayerManager.Instance.GetPlayerList())
+            //检查UUID
+            if (!CheckUUID(senderUUID))
+            {
+                return Offline();
+            }
+
+            //群发
+            foreach (Player player in PlayerManager.Instance.GetLobbyPlayerList())
             {
                 if (player.UUID != senderUUID)
                 {
@@ -111,7 +132,14 @@ namespace CardServerControl.Util
         public SocketModel PlayerInfoPacket(PlayerInfoDTO data)
         {
             string UUID = data.UUID;
-            Player senderPlayer = PlayerManager.Instance.GetPlayerByUUID(UUID);
+
+            //检查UUID
+            if (!CheckUUID(UUID))
+            {
+                return Offline();
+            }
+
+            Player senderPlayer = PlayerManager.Instance.GetLobbyPlayerByUUID(UUID);
             int uid = senderPlayer.uid;
 
             string command = string.Format("SELECT * FROM playerinfo WHERE Uid = '{0}'", uid);
@@ -172,6 +200,19 @@ namespace CardServerControl.Util
             model.returnCode = ReturnCode.Success;
             model.protocol = SocketProtocol.CARDINFOLIST;
             model.message = JsonCoding<CardInfoDTO>.encode(returnData);
+
+            return model;
+        }
+
+        /// <summary>
+        /// 返回断线信息包
+        /// </summary>
+        /// <returns></returns>
+        private SocketModel Offline()
+        {
+            SocketModel model = new SocketModel();
+            model.returnCode = ReturnCode.Refuse;
+            model.protocol = SocketProtocol.OFFLINE;
 
             return model;
         }

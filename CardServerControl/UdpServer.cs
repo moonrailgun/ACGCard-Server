@@ -124,7 +124,7 @@ namespace CardServerControl
         /// </summary>
         public void SendToPlayerByUUID(string message, string UUID)
         {
-            foreach (Player player in PlayerManager.Instance.GetPlayerList())
+            foreach (Player player in PlayerManager.Instance.GetLobbyPlayerList())
             {
                 if (player.UUID == UUID)
                 {
@@ -195,7 +195,7 @@ namespace CardServerControl
         /// <param name="messageByte"></param>
         public void SendToAllPlayer(byte[] messageByte)
         {
-            List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+            List<Player> playerList = PlayerManager.Instance.GetLobbyPlayerList();
             foreach (Player player in playerList)
             {
                 //-------------------------------注意这里是同步发送所以后期可能需要修改

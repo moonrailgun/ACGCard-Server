@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CardServerControl.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CardServerControl" Height="449.096" Width="652.56" WindowStyle="ToolWindow" Closed="Window_Closed">
+        Title="CardServerControl" Height="449.096" Width="652.56" WindowStyle="ToolWindow" Closed="Window_Closed" Icon="MRG.ico">
     <Grid>
         <Menu MaxHeight="20" FontSize="16" Height="20" Background="#FFEEEEEE" VerticalAlignment="Top">
             <MenuItem Header="服务器">

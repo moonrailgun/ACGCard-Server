@@ -15,7 +15,6 @@ namespace CardServerControl
     {
         public List<GameRoom> rooms;
         private int availableRoomID;
-        //public List<GameRequestDTO> undistributedRequest;
         public List<Socket> unknownSocket;
         public List<PlayerSocket> freedomPlayer;
 

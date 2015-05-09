@@ -116,12 +116,12 @@ namespace CardServerControl
                     {
                         int playerUid = Convert.ToInt32(args[1]);
 
-                        Player player = PlayerManager.Instance.GetPlayerByUid(playerUid);
+                        Player player = PlayerManager.Instance.GetLobbyPlayerByUid(playerUid);
                         if (player != null)
                         {
                             //玩家在线
                             logsSystem.Print(string.Format("玩家[{0}({1})]已经被踢出了服务器", player.playerName, player.uid));
-                            PlayerManager.Instance.PlayerLogout(playerUid);
+                            PlayerManager.Instance.LobbyPlayerLogout(playerUid);
                         }
                         else
                         {
@@ -262,7 +262,7 @@ namespace CardServerControl
         /// </summary>
         private void ShowPlayerList(object sender, RoutedEventArgs e)
         {
-            List<Player> playerList = PlayerManager.Instance.GetPlayerList();
+            List<Player> playerList = PlayerManager.Instance.GetLobbyPlayerList();
             int i = 0;
             string listTXT = "";
             foreach (Player player in playerList)
@@ -277,7 +277,7 @@ namespace CardServerControl
                 }
                 i++;
             }
-            logsSystem.Print(string.Format("\r\n\t当前在线玩家为{0}/{1}\r\n\t玩家列表:{2}", i, PlayerManager.Instance.maxPlayerNumber, listTXT));
+            logsSystem.Print(string.Format("\r\n\t当前在线玩家为{0}(游戏中{3})/{1}\r\n\t玩家列表:{2}", i, PlayerManager.Instance.maxPlayerNumber, listTXT,PlayerManager.Instance.GetGamePlayerNumber()));
         }
         #endregion
     }

@@ -4,6 +4,7 @@ using CardServerControl.Model.DTO.GameData;
 using System;
 using System.Data;
 using System.Net.Sockets;
+using System.Net;
 
 namespace CardServerControl.Util
 {
@@ -22,7 +23,14 @@ namespace CardServerControl.Util
                 case OperateCode.Identify:
                     {
                         string UUID = operateData;
-                        return ProcessIdentify(UUID, socket);
+                        if (CheckUUID(UUID))
+                        {
+                            return ProcessIdentify(UUID, socket);
+                        }
+                        else
+                        {
+                            return Offline();
+                        }
                     }
                 default:
                     {
@@ -31,6 +39,24 @@ namespace CardServerControl.Util
             }
             return null;
         }
+
+        /// <summary>
+        /// 检查UUID是否合法
+        /// </summary>
+        private bool CheckUUID(string uuid)
+        {
+            string command = string.Format("SELECT * FROM account WHERE UUID = '{0}'", uuid);
+            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+            if (ds.Tables[0].Rows.Count > 0)//UUID验证通过
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// 根据UUID做
         /// 身份验证处理
@@ -57,6 +83,9 @@ namespace CardServerControl.Util
 
                     //绑定
                     TcpServer.Instance.GetGameRoomManager().BindSocket(playerInfo, socket);
+
+                    //添加入玩家管理
+                    PlayerManager.Instance.PlayerLoginGameServer(playerInfo.playerUid, playerInfo.playerName, playerInfo.playerUUID, socket);
                 }
                 else
                 {
@@ -68,6 +97,18 @@ namespace CardServerControl.Util
                 LogsSystem.Instance.Print("发生异常" + ex.ToString(), LogLevel.ERROR);
             }
             return null;
+        }
+
+        /// <summary>
+        /// 返回断线信息
+        /// </summary>
+        private GameData Offline()
+        {
+            GameData data = new GameData();
+            data.operateCode = OperateCode.Offline;
+            data.returnCode = ReturnCode.Refuse;
+
+            return data;
         }
     }
 }

@@ -5,6 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using CardServerControl.Model.DTO;
+using CardServerControl.Model;
+using CardServerControl.Util;
+using CardServerControl.Model.DTO.GameData;
+using System.Net.Sockets;
 
 /*
  * TODO
@@ -29,38 +34,116 @@ namespace CardServerControl
         }
         #endregion
 
-        private List<Player> playerList;//服务器玩家列表
+        private List<Player> lobbyPlayerList;//大厅服务器玩家列表
+        private List<PlayerSocket> gamePlayerList;//游戏服务器玩家列表
         public int maxPlayerNumber;//服务器最高人数
 
         private PlayerManager()
         {
-            playerList = new List<Player>();
+            lobbyPlayerList = new List<Player>();
+            gamePlayerList = new List<PlayerSocket>();
             maxPlayerNumber = 20;
         }
-
-        public void PlayerLogin(int uid, string playerName, string UUID, IPEndPoint iped)
+        /// <summary>
+        /// 玩家登陆大厅
+        /// </summary>
+        public void PlayerLoginLobby(int uid, string playerName, string UUID, IPEndPoint iped)
         {
+            //检查玩家是否已经登陆。如果已登陆则踢出之前的
+            foreach (Player onlinePlayer in lobbyPlayerList)
+            {
+                if (onlinePlayer.uid == uid && onlinePlayer.UUID != UUID)
+                {
+                    //踢出大厅
+                    SocketModel model = new SocketModel();
+                    model.protocol = SocketProtocol.OFFLINE;
+                    model.returnCode = ReturnCode.Refuse;
+
+                    UdpServer.Instance.SendMsg(JsonCoding<SocketModel>.encode(model), onlinePlayer.IPed.Address.ToString(), onlinePlayer.IPed.Port);//发送断线消息
+                    this.lobbyPlayerList.Remove(onlinePlayer);
+
+                    //踢出游戏
+                    foreach (PlayerSocket gameOnlinePlayer in gamePlayerList)
+                    {
+                        if (gameOnlinePlayer.playerInfo.playerUid == onlinePlayer.uid)
+                        {
+                            GameData data = new GameData();
+                            data.operateCode = OperateCode.Offline;
+                            data.returnCode = ReturnCode.Refuse;
+
+                            TcpServer.Instance.Send(gameOnlinePlayer.socket, data);
+                            this.gamePlayerList.Remove(gameOnlinePlayer);
+                            break;//离开游戏玩家列表遍历循环
+                        }
+                    }
+                    break;//离开大厅玩家列表遍历循环
+                }
+            }
+
+            //登陆系统
             Player player = new Player();
             player.uid = uid;
             player.playerName = playerName;
             player.UUID = UUID;
             player.IPed = iped;
 
-            this.playerList.Add(player);
-        }
+            this.lobbyPlayerList.Add(player);
 
-        public List<Player> GetPlayerList()
-        {
-            return this.playerList;
+            //登陆成功
+            LogsSystem.Instance.Print(string.Format("玩家{0}[{1}]已登录到游戏", playerName, iped.Address.ToString()));
         }
 
         /// <summary>
-        /// 返回现在玩家人数
+        /// 玩家登陆游戏服务器
         /// </summary>
-        public int GetPlayerNumber()
+        public void PlayerLoginGameServer(int uid, string playerName, string UUID, Socket socket)
         {
-            return playerList.Count;
+            //检查玩家是否已经登陆。如果已登陆则踢出之前的
+            foreach (PlayerSocket onlinePlayer in gamePlayerList)
+            {
+                string onlinePlayerUUID = onlinePlayer.playerInfo.playerUUID;
+                if (onlinePlayerUUID == UUID)
+                {
+                    GameData data = new GameData();
+                    data.operateCode = OperateCode.Offline;
+                    data.returnCode = ReturnCode.Refuse;
+
+                    TcpServer.Instance.Send(onlinePlayer.socket, data);
+
+                    //TcpServer.Instance.
+                    //UdpServer.Instance.SendMsg(JsonCoding<GameData>.encode(model), onlinePlayer.IPed.Address.ToString(), onlinePlayer.IPed.Port);//发送断线消息
+                    this.gamePlayerList.Remove(onlinePlayer);
+                }
+            }
+
+            //登陆系统
+            PlayerInfoData pid = new PlayerInfoData();
+            pid.playerUid = uid;
+            pid.playerName = playerName;
+            pid.playerUUID = UUID;
+
+            PlayerSocket ps = new PlayerSocket(pid, socket);
+            this.gamePlayerList.Add(ps);
         }
+
+        public List<Player> GetLobbyPlayerList()
+        {
+            return this.lobbyPlayerList;
+        }
+
+        /// <summary>
+        /// 返回现在在游戏中玩家人数
+        /// </summary>
+        public int GetGamePlayerNumber()
+        {
+            return this.gamePlayerList.Count;
+        }
+
+        /// <summary>
+        /// 返回大厅玩家
+        /// </summary>
+        public int GetLobbyPlayerNumber()
+        { return this.lobbyPlayerList.Count; }
 
         /// <summary>
         /// 返回是否能登陆
@@ -70,7 +153,7 @@ namespace CardServerControl
         /// <returns></returns>
         public bool CanLogin()
         {
-            return GetPlayerNumber() < maxPlayerNumber;
+            return GetGamePlayerNumber() < maxPlayerNumber;
         }
 
         /// <summary>
@@ -78,7 +161,7 @@ namespace CardServerControl
         /// </summary>
         public string GetPlayerNameByUUID(string uuid)
         {
-            Player player = GetPlayerByUUID(uuid);
+            Player player = GetLobbyPlayerByUUID(uuid);
             if (player != null)
             {
                 return player.playerName;
@@ -94,9 +177,9 @@ namespace CardServerControl
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        public string GetPlayerUUIDByName(string username)
+        public string GetLobbyPlayerUUIDByName(string username)
         {
-            foreach (Player player in playerList)
+            foreach (Player player in lobbyPlayerList)
             {
                 if (player.playerName == username)
                 {
@@ -111,9 +194,9 @@ namespace CardServerControl
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        public Player GetPlayerByUid(int uid)
+        public Player GetLobbyPlayerByUid(int uid)
         {
-            foreach (Player player in playerList)
+            foreach (Player player in lobbyPlayerList)
             {
                 if (player.uid == uid)
                 {
@@ -126,9 +209,9 @@ namespace CardServerControl
         /// <summary>
         /// 根据UUID获取玩家对象
         /// </summary>
-        public Player GetPlayerByUUID(string uuid)
+        public Player GetLobbyPlayerByUUID(string uuid)
         {
-            foreach (Player player in playerList)
+            foreach (Player player in lobbyPlayerList)
             {
                 if (player.UUID == uuid)
                 {
@@ -140,31 +223,30 @@ namespace CardServerControl
 
         public void ClearPlayerList()
         {
-            playerList.Clear();
+            gamePlayerList.Clear();
         }
 
         /// <summary>
         /// 玩家登出
         /// </summary>
-        public void PlayerLogout(int uid)
+        public void LobbyPlayerLogout(int uid)
         {
-            foreach (Player player in playerList)
+            foreach (Player player in lobbyPlayerList)
             {
                 if (player.uid == uid)
                 {
                     string command = string.Format("UPDATE account SET UUID = '' WHERE Uid = '{0}'", uid);
                     MySQLHelper.ExecuteNonQuery(MySQLHelper.Conn, CommandType.Text, command, null);
-                    playerList.Remove(player);
                     return;
                 }
             }
         }
-        public void PlayerLogout(string uuid)
+        public void LobbyPlayerLogout(string uuid)
         {
-            Player player = GetPlayerByUUID(uuid);
+            Player player = GetLobbyPlayerByUUID(uuid);
             if (player != null)
             {
-                PlayerLogout(player.uid);
+                LobbyPlayerLogout(player.uid);
             }
         }
     }
