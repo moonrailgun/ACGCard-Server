@@ -206,7 +206,7 @@ namespace CardServerControl
 
             //转换数据
             GameData data = JsonCoding<GameData>.decode(message);
-            GameData returnData = tcpDH.ProcessTcpData(data.operateCode, data.operateData, socket);
+            GameData returnData = tcpDH.ProcessTcpData(data, socket);
             if (returnData != null)
             {
                 string returnMessage = JsonCoding<GameData>.encode(returnData);
@@ -214,6 +214,10 @@ namespace CardServerControl
             }
         }
         #endregion
+
+
+        public GameRoomManager GetRoomManager()
+        { return this.grm; }
     }
 
     class StateObject

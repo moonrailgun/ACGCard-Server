@@ -16,8 +16,10 @@ namespace CardServerControl.Util
         /// 并返回相应
         /// 如果返回null则不发送
         /// </summary>
-        public GameData ProcessTcpData(int operateCode, string operateData, Socket socket)
+        public GameData ProcessTcpData(GameData data, Socket socket)
         {
+            int operateCode = data.operateCode;
+            string operateData = data.operateData;
             switch (operateCode)
             {
                 case OperateCode.Identify:
@@ -31,6 +33,10 @@ namespace CardServerControl.Util
                         {
                             return Offline();
                         }
+                    }
+                case OperateCode.Offline:
+                    {
+                        return ProcessCancelMatching(JsonCoding<DisconnectDTO>.decode(data.operateData), socket);
                     }
                 default:
                     {
@@ -97,6 +103,22 @@ namespace CardServerControl.Util
                 LogsSystem.Instance.Print("发生异常" + ex.ToString(), LogLevel.ERROR);
             }
             return null;
+        }
+
+        /// <summary>
+        /// 取消匹配|主动发送断线请求
+        /// 清除房间列表和玩家列表后返回断线信息完成断线
+        /// </summary>
+        private GameData ProcessCancelMatching(DisconnectDTO data, Socket socket)
+        {
+            //服务端断线
+            if (data.protocol == (int)LinkProtocol.TCP)
+            {
+                //断开游戏，不退出大厅
+                PlayerManager.Instance.GamePlayerLogout(data.uid, socket);
+            }
+
+            return Offline();
         }
 
         /// <summary>

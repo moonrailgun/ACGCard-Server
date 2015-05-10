@@ -227,7 +227,7 @@ namespace CardServerControl
         }
 
         /// <summary>
-        /// 玩家登出
+        /// 大厅玩家登出
         /// </summary>
         public void LobbyPlayerLogout(int uid)
         {
@@ -248,6 +248,23 @@ namespace CardServerControl
             {
                 LobbyPlayerLogout(player.uid);
             }
+        }
+
+        /// <summary>
+        /// 游戏玩家退出
+        /// </summary>
+        public void GamePlayerLogout(int uid,Socket socket)
+        {
+            //清除列表
+            foreach (PlayerSocket player in gamePlayerList)
+            {
+                if (player.playerInfo.playerUid == uid)
+                {
+                    gamePlayerList.Remove(player);
+                }
+            }
+
+            TcpServer.Instance.GetRoomManager().LeaveRoom(uid,socket);
         }
     }
 }

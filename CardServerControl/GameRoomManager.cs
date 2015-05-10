@@ -62,7 +62,7 @@ namespace CardServerControl
 
             //对A发送信息
             data.operateData = messageToA;
-            TcpServer.Instance.Send(playerSocketA.socket,data);
+            TcpServer.Instance.Send(playerSocketA.socket, data);
 
             //对B发送信息
             data.operateData = messageToB;
@@ -72,16 +72,6 @@ namespace CardServerControl
 
             return newroom;
         }
-
-        /*
-        /// <summary>
-        /// 添加请求到未分配队列
-        /// </summary>
-        public void AddRequest(GameRequestDTO request)
-        {
-            if (!undistributedRequest.Contains(request))
-                undistributedRequest.Add(request);
-        }*/
 
         /// <summary>
         /// 把socket连接添加到房间
@@ -196,6 +186,70 @@ namespace CardServerControl
             catch (Exception ex)
             {
                 LogsSystem.Instance.Print("绑定连接失败，可能是不存在该连接:" + ex.ToString(), LogLevel.WARN);
+            }
+        }
+
+        /// <summary>
+        /// 销毁一个房间
+        /// </summary>
+        public void DestroyRoom(int roomID)
+        {
+            foreach (GameRoom room in rooms)
+            {
+                if (room.roomID == roomID)
+                {
+                    rooms.Remove(room);
+                    LogsSystem.Instance.Print("向两端发送房间销毁信息，未完成", LogLevel.ERROR);
+
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 玩家离开房间
+        /// </summary>
+        public void LeaveRoom(int uid, Socket socket)
+        {
+            //检查未验证队列
+            foreach (Socket _socket in unknownSocket)
+            {
+                if (_socket == socket)
+                {
+                    unknownSocket.Remove(_socket);
+                    _socket.Close();
+                    return;
+                }
+            }
+
+            //检查队列
+            foreach (PlayerSocket player in freedomPlayer)
+            {
+                if (player.playerInfo.playerUid == uid)
+                {
+                    freedomPlayer.Remove(player);//清除列表
+                    player.socket.Close();//关闭连接
+                    return;
+                }
+            }
+
+            //检查游戏房间
+            foreach (GameRoom room in rooms)
+            {
+                if (room.playerSocketA.playerInfo.playerUid == uid)
+                {
+                    room.playerSocketA.socket.Close();//关闭连接
+                    LogsSystem.Instance.Print("向B发送A断线消息，未完成", LogLevel.ERROR);
+                    DestroyRoom(room.roomID);//销毁房间
+                    return;
+                }
+                if (room.playerSocketB.playerInfo.playerUid == uid)
+                {
+                    room.playerSocketB.socket.Close();
+                    LogsSystem.Instance.Print("向A发送B断线消息，未完成", LogLevel.ERROR);
+                    DestroyRoom(room.roomID);
+                    return;
+                }
             }
         }
     }
