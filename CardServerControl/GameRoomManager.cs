@@ -36,13 +36,18 @@ namespace CardServerControl
             rooms.Add(newroom);
             availableRoomID++;
 
+            //对playerA发送的卡片信息
+            TcpServer.Instance.Send(playerSocketA.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(playerSocketA.playerInfo.playerUid, playerSocketA.playerInfo.playerUUID));
+            //对playerB发送的卡片信息
+            TcpServer.Instance.Send(playerSocketB.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(playerSocketB.playerInfo.playerUid, playerSocketB.playerInfo.playerUUID));
+
             //发送数据,让客户端建立房间
             //通用数据
-            GameData data = new GameData();
-            data.operateCode = OperateCode.AllocRoom;
-            data.returnCode = ReturnCode.Success;
+            GameData roomData = new GameData();
+            roomData.operateCode = OperateCode.AllocRoom;
+            roomData.returnCode = ReturnCode.Success;
 
-            //对playerA发送的信息
+            //对playerA发送的房间信息
             AllocRoomData roomDataToPlayerA = new AllocRoomData();
             roomDataToPlayerA.roomID = roomID;
             roomDataToPlayerA.allocPosition = AllocRoomData.Position.A;
@@ -51,7 +56,7 @@ namespace CardServerControl
             roomDataToPlayerA.rivalUUID = playerSocketB.playerInfo.playerUUID;
             string messageToA = JsonCoding<AllocRoomData>.encode(roomDataToPlayerA);
 
-            //对playerB发送的信息
+            //对playerB发送的房间信息
             AllocRoomData roomDataToPlayerB = new AllocRoomData();
             roomDataToPlayerB.roomID = roomID;
             roomDataToPlayerB.allocPosition = AllocRoomData.Position.B;
@@ -61,12 +66,12 @@ namespace CardServerControl
             string messageToB = JsonCoding<AllocRoomData>.encode(roomDataToPlayerB);
 
             //对A发送信息
-            data.operateData = messageToA;
-            TcpServer.Instance.Send(playerSocketA.socket, data);
+            roomData.operateData = messageToA;
+            TcpServer.Instance.Send(playerSocketA.socket, roomData);
 
             //对B发送信息
-            data.operateData = messageToB;
-            TcpServer.Instance.Send(playerSocketB.socket, data);
+            roomData.operateData = messageToB;
+            TcpServer.Instance.Send(playerSocketB.socket, roomData);
 
             LogsSystem.Instance.Print(string.Format("房间{0}创建完毕；对战玩家[{1},{2}]", roomID, playerSocketA.playerInfo.playerName, playerSocketB.playerInfo.playerName));
 

@@ -28,6 +28,7 @@ namespace CardServerControl
         public static Encoding encoding = Encoding.UTF8;
         private GameRoomManager grm;
         private TCPDataHandler tcpDH;
+        private TCPDataSender tcpSD;
         public const int gamePort = 28283;
         private TcpListener listener;
 
@@ -41,6 +42,7 @@ namespace CardServerControl
                 LogsSystem.Instance.Print("正在初始化TCP服务");
                 grm = new GameRoomManager();
                 tcpDH = new TCPDataHandler();
+                tcpSD = new TCPDataSender();
                 listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
                 listener.Start();
                 listener.BeginAcceptTcpClient(AcceptTcpClient, listener);//开始异步接受TCP连接
@@ -107,6 +109,14 @@ namespace CardServerControl
         public GameRoomManager GetGameRoomManager()
         {
             return this.grm;
+        }
+
+        /// <summary>
+        /// 获取tcp数据发送器
+        /// </summary>
+        public TCPDataSender GetTCPDataSender()
+        {
+            return this.tcpSD;
         }
 
         #region 发送数据
@@ -220,10 +230,6 @@ namespace CardServerControl
             }
         }
         #endregion
-
-
-        public GameRoomManager GetRoomManager()
-        { return this.grm; }
     }
 
     class StateObject

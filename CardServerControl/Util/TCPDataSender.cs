@@ -13,6 +13,7 @@ namespace CardServerControl.Util
     class TCPDataSender
     {
         /// <summary>
+        /// 根据玩家的UUID和UID
         /// 发送玩家拥有的卡片
         /// </summary>
         public GameData SendPlayerOwnCard(int uid, string UUID)
@@ -27,7 +28,7 @@ namespace CardServerControl.Util
                 data.playerUid = uid;
 
                 //获取背包信息
-                data.cardInv = new List<PlayerCard>();
+                data.cardInv = new List<CardInfo>();
                 command =  string.Format("SELECT * FROM cardinventory WHERE CardOwnerId = '{0}'",uid);
                 DataSet cardInventory = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
                 foreach (DataRow row in cardInventory.Tables[0].Rows)
@@ -36,22 +37,21 @@ namespace CardServerControl.Util
                     {
                         PlayerCard playerCard = new PlayerCard();
                         playerCard.cardId = Convert.ToInt32(row["CardId"]);
+                        playerCard.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
+                        playerCard.cardLevel = Convert.ToInt32(row["CardLevel"]);
                         playerCard.specialHealth = Convert.ToInt32(row["SpecialHealth"]);
-                        playerCard.specialMana = Convert.ToInt32(row["SpecialMana"]);
+                        playerCard.specialEnergy = Convert.ToInt32(row["SpecialEnergy"]);
                         playerCard.specialAttack = Convert.ToInt32(row["SpecialAttack"]);
+                        playerCard.specialSpeed = Convert.ToInt32(row["SpecialSpeed"]);
 
-                        //------------------------------------------在卡片管理器中寻找卡片标准数据(标准生命值什么的)，然后附加上玩家独立的数据
-
-                        data.cardInv.Add(playerCard);//添加到队列
-                        
-                        throw new NotImplementedException();
+                        CardInfo cardInfo = playerCard.GetCardInfo();
+                        data.cardInv.Add(cardInfo);//添加到列表
                     }
                     catch (Exception ex)
                     {
                         LogsSystem.Instance.Print(ex.ToString(), LogLevel.WARN);
                     }
                 }
-                
 
                 //封装
                 GameData returnData = new GameData();

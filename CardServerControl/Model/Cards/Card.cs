@@ -6,11 +6,22 @@ using System.Threading.Tasks;
 
 namespace CardServerControl.Model.Cards
 {
-    class Card
+    /// <summary>
+    /// 标准卡片属性
+    /// </summary>
+    class Card: ICloneable
     {
         public int cardId;
         public string cardName;
         public int cardRarity;
+        public int baseHealth;
+        public int baseEnergy;
+        public int baseAttack;
+        public int baseSpeed;
+        public int growHealth;
+        public int growEnergy;
+        public int growAttack;
+        public int growSpeed;
 
         public Card()
         {
@@ -21,6 +32,11 @@ namespace CardServerControl.Model.Cards
             this.cardId = id;
             this.cardName = name;
             this.cardRarity = rarity;
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 }

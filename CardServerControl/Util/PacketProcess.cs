@@ -158,6 +158,7 @@ namespace CardServerControl.Util
             returnData.level = Convert.ToInt32(ds.Tables[0].Rows[0]["Level"]);
             returnData.coin = Convert.ToInt32(ds.Tables[0].Rows[0]["Coin"]);
             returnData.gem = Convert.ToInt32(ds.Tables[0].Rows[0]["Gem"]);
+            
 
             //returnData.vipExpire = DateTime.Parse(ds.Tables[0].Rows[0]["VipExpire"].ToString());
 
@@ -187,9 +188,6 @@ namespace CardServerControl.Util
                 cardInfo.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
                 cardInfo.cardRarity = UdpServer.Instance.cardManager.GetRarityByCardId(cardId);
                 cardInfo.cardName = UdpServer.Instance.cardManager.GetNameById(cardId);
-                cardInfo.specialHealth = Convert.ToInt32(row["SpecialHealth"]);
-                cardInfo.specialMana = Convert.ToInt32(row["SpecialMana"]);
-                cardInfo.specialAttack = Convert.ToInt32(row["SpecialAttack"]);
 
                 cardInfoList.Add(cardInfo);
             }

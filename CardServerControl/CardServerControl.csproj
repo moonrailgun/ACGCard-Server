@@ -78,7 +78,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CardManager.cs" />
-    <Compile Include="GameRoom.cs" />
     <Compile Include="GameRoomManager.cs" />
     <Compile Include="Model\AreaCode.cs" />
     <Compile Include="Model\Cards\Card.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="Model\DTO\LoginDTO.cs" />
     <Compile Include="Model\DTO\PlayerInfoDTO.cs" />
     <Compile Include="Model\ErrorCode.cs" />
+    <Compile Include="Model\GameRoom.cs" />
     <Compile Include="Model\OperateCode.cs" />
     <Compile Include="Model\ReturnCode.cs" />
     <Compile Include="Model\SocketModel.cs" />

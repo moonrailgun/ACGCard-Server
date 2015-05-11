@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CardServerControl.Model.DTO.GameData;
 
-namespace CardServerControl
+namespace CardServerControl.Model
 {
     class GameRoom
     {

@@ -265,7 +265,7 @@ namespace CardServerControl
                 }
             }
             //离开游戏房间
-            TcpServer.Instance.GetRoomManager().LeaveRoom(uid,socket);
+            TcpServer.Instance.GetGameRoomManager().LeaveRoom(uid,socket);
         }
     }
 }

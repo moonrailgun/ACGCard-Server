@@ -24,12 +24,27 @@ namespace CardServerControl
 
                 foreach (DataRow row in ds.Tables[0].Rows)
                 {
-                    int cardId = Convert.ToInt32(row["CardId"]);
-                    string cardName = row["CardName"].ToString();
-                    int cardRarity = Convert.ToInt32(row["CardRarity"]);
+                    try
+                    {
+                        Card card = new Card();
+                        card.cardId = Convert.ToInt32(row["CardId"]);
+                        card.cardName = row["CardName"].ToString();
+                        card.cardRarity = Convert.ToInt32(row["CardRarity"]);
+                        card.baseHealth = Convert.ToInt32(row["BaseHealth"]);
+                        card.baseEnergy = Convert.ToInt32(row["BaseEnergy"]);
+                        card.baseAttack = Convert.ToInt32(row["BaseAttack"]);
+                        card.baseSpeed = Convert.ToInt32(row["BaseSpeed"]);
+                        card.growHealth = Convert.ToInt32(row["GrowHealth"]);
+                        card.growEnergy = Convert.ToInt32(row["GrowEnergy"]);
+                        card.growAttack = Convert.ToInt32(row["GrowAttack"]);
+                        card.growSpeed = Convert.ToInt32(row["GrowSpeed"]);
 
-                    Card card = new Card(cardId, cardName, cardRarity);
-                    cardList.Add(card);
+                        cardList.Add(card);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogsSystem.Instance.Print(ex.ToString(), LogLevel.WARN);
+                    }
                 }
 
                 LogsSystem.Instance.Print("卡片数据加载完毕");
@@ -62,6 +77,18 @@ namespace CardServerControl
                 }
             }
             return "";
+        }
+
+        public Card GetCardByID(int cardId)
+        {
+            foreach (Card card in cardList)
+            {
+                if (card.cardId == cardId)
+                {
+                    return card.Clone() as Card;
+                }
+            }
+            return null;
         }
     }
 }
