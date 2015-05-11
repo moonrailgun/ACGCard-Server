@@ -86,6 +86,7 @@
     <Compile Include="Model\DTO\CardInfoDTO.cs" />
     <Compile Include="Model\DTO\ChatDTO.cs" />
     <Compile Include="Model\DTO\CommonDTO.cs" />
+    <Compile Include="Model\DTO\DisconnectDTO.cs" />
     <Compile Include="Model\DTO\ErrorDTO.cs" />
     <Compile Include="Model\DTO\GameData\GameData.cs" />
     <Compile Include="Model\DTO\GameData\AllocRoomData.cs" />

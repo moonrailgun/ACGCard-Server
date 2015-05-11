@@ -118,11 +118,12 @@ namespace CardServerControl.Util
                 PlayerManager.Instance.GamePlayerLogout(data.uid, socket);
             }
 
-            return Offline();
+            return null;
         }
 
         /// <summary>
         /// 返回断线信息
+        /// 用于把用户踢出
         /// </summary>
         private GameData Offline()
         {

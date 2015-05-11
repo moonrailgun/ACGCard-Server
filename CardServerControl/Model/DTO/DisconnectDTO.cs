@@ -1,18 +1,19 @@
-﻿using CardServerControl.Model.DTO;
-using System.Collections;
-
-/// <summary>
+﻿/// <summary>
 /// 断开连接
 /// </summary>
-public class DisconnectDTO : CommonDTO
+namespace CardServerControl.Model.DTO
 {
-    public string UUID;
-    public int uid;
-    public int protocol;
+    class DisconnectDTO : CommonDTO
+    {
+        public string UUID;
+        public int uid;
+        public int protocol;
+    }
+
+    enum LinkProtocol
+    {
+        UDP = 0,
+        TCP = 1
+    }
 }
 
-public enum LinkProtocol
-{
-    UDP = 0,
-    TCP = 1
-}

@@ -50,7 +50,7 @@ namespace CardServerControl
             {
                 LogsSystem.Instance.Print("TCP服务创建失败：" + ex.ToString(), LogLevel.ERROR);
             }
-            
+
         }
 
         /// <summary>
@@ -119,7 +119,10 @@ namespace CardServerControl
         public void Send(Socket socket, byte[] data)
         {
             LogsSystem.Instance.Print(string.Format("发送数据({0}):{1}", data.Length, encoding.GetString(data)));
-            socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), socket);
+            if (socket.Connected && socket != null)
+            {
+                socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), socket);
+            }
         }
         private void SendCallback(IAsyncResult ar)
         {
@@ -142,9 +145,12 @@ namespace CardServerControl
         {
             try
             {
-                StateObject state = new StateObject();
-                state.socket = client;
-                client.BeginReceive(state.buffer, 0, StateObject.buffSize, 0, new AsyncCallback(ReceiveCallback), state);
+                if (client.Connected)
+                {
+                    StateObject state = new StateObject();
+                    state.socket = client;
+                    client.BeginReceive(state.buffer, 0, StateObject.buffSize, 0, new AsyncCallback(ReceiveCallback), state);
+                }
             }
             catch (Exception e)
             {

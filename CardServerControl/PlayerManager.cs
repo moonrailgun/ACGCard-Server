@@ -261,9 +261,10 @@ namespace CardServerControl
                 if (player.playerInfo.playerUid == uid)
                 {
                     gamePlayerList.Remove(player);
+                    break;
                 }
             }
-
+            //离开游戏房间
             TcpServer.Instance.GetRoomManager().LeaveRoom(uid,socket);
         }
     }

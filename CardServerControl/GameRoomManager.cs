@@ -217,7 +217,7 @@ namespace CardServerControl
                 if (_socket == socket)
                 {
                     unknownSocket.Remove(_socket);
-                    _socket.Close();
+                    _socket.Close();//关闭连接
                     return;
                 }
             }
@@ -229,6 +229,7 @@ namespace CardServerControl
                 {
                     freedomPlayer.Remove(player);//清除列表
                     player.socket.Close();//关闭连接
+                    LogsSystem.Instance.Print(string.Format("已关闭{0}连接", player.playerInfo.playerName));
                     return;
                 }
             }

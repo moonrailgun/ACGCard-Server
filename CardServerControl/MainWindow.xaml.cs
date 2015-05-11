@@ -83,6 +83,10 @@ namespace CardServerControl
             {
                 ShowPlayerList(null, null);
             }
+            else if (args[0] == "rooms")
+            {
+                ShowRoomsInfo(null, null);
+            }
             else if (args[0] == "say")
             {
                 if (args.Length == 1) { ArgNotEnough(); return; }
@@ -133,10 +137,6 @@ namespace CardServerControl
                     {
                         logsSystem.Print("请输入玩家的Uid" + ex.ToString());
                     }
-
-
-
-
                 }
             }
             else if (args[0] == "help")
@@ -277,7 +277,33 @@ namespace CardServerControl
                 }
                 i++;
             }
-            logsSystem.Print(string.Format("\r\n\t当前在线玩家为{0}(游戏中{3})/{1}\r\n\t玩家列表:{2}", i, PlayerManager.Instance.maxPlayerNumber, listTXT,PlayerManager.Instance.GetGamePlayerNumber()));
+            logsSystem.Print(string.Format("\r\n\t当前在线玩家为{0}(游戏中{3})/{1}\r\n\t玩家列表:{2}", i, PlayerManager.Instance.maxPlayerNumber, listTXT, PlayerManager.Instance.GetGamePlayerNumber()));
+        }
+
+        /// <summary>
+        /// 显示房间信息
+        /// </summary>
+        private void ShowRoomsInfo(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string showText = "";
+                GameRoomManager grm = TcpServer.Instance.GetGameRoomManager();
+                if (grm != null)
+                {
+                    showText = string.Format("\n\t正在进行游戏的房间有 {0} 个,\n\t已绑定的用户连接有 {1} 个,\n\t未知的连接有 {2} 个", grm.rooms.Count, grm.freedomPlayer.Count, grm.unknownSocket.Count);
+                }
+                else
+                {
+                    showText = "无法取得房间信息。请确认游戏服务器已经开启";
+                }
+
+                logsSystem.Print(showText);
+            }
+            catch (Exception ex)
+            {
+                logsSystem.Print("无法获取房间信息异常：" + ex.ToString(), LogLevel.WARN);
+            }
         }
         #endregion
     }

@@ -9,6 +9,7 @@
                 <MenuItem Header="关闭服务端" Click="MenuCloseServer" />
                 <Separator />
                 <MenuItem Header="玩家列表" Click="ShowPlayerList" />
+                <MenuItem Header="房间信息" Click="ShowRoomsInfo" />
                 <MenuItem Header="日志记录">
                     <MenuItem Header="清空屏幕" Click="ClearScreen" />
                     <Separator />
