@@ -81,8 +81,9 @@
     <Compile Include="GameRoom.cs" />
     <Compile Include="GameRoomManager.cs" />
     <Compile Include="Model\AreaCode.cs" />
-    <Compile Include="Model\Card.cs" />
+    <Compile Include="Model\Cards\Card.cs" />
     <Compile Include="Model\CardInfo.cs" />
+    <Compile Include="Model\Cards\PlayerCard.cs" />
     <Compile Include="Model\DTO\CardInfoDTO.cs" />
     <Compile Include="Model\DTO\ChatDTO.cs" />
     <Compile Include="Model\DTO\CommonDTO.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Model\DTO\GameData\GameData.cs" />
     <Compile Include="Model\DTO\GameData\AllocRoomData.cs" />
     <Compile Include="Model\DTO\GameData\AttackData.cs" />
+    <Compile Include="Model\DTO\GameData\GamePlayerOwnCardData.cs" />
     <Compile Include="Model\DTO\GameData\PlayerInfoData.cs" />
     <Compile Include="Model\DTO\GameData\PlayerSocket.cs" />
     <Compile Include="Model\DTO\GameData\UseSkillData.cs" />

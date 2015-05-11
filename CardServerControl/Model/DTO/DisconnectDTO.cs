@@ -5,9 +5,9 @@ namespace CardServerControl.Model.DTO
 {
     class DisconnectDTO : CommonDTO
     {
-        public string UUID;
-        public int uid;
-        public int protocol;
+        public string UUID ="";
+        public int uid = -1;
+        public int protocol = -1;
     }
 
     enum LinkProtocol

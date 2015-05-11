@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CardServerControl.Model;
 using System.Data;
+using CardServerControl.Model.Cards;
 
 namespace CardServerControl
 {
