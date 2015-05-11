@@ -9,8 +9,8 @@ namespace CardServerControl.Model.Cards
     class PlayerCard : Card
     {
         public int cardOwnerId;
-        public int SpecialHealth;
-        public int SpecialMana;
-        public int SpecialAttack;
+        public int specialHealth;
+        public int specialMana;
+        public int specialAttack;
     }
 }

@@ -25,13 +25,13 @@ namespace CardServerControl.Util
                 case OperateCode.Identify:
                     {
                         string UUID = operateData;
-                        if (CheckUUID(UUID))
+                        if (TCPDataSender.CheckUUID(UUID))
                         {
                             return ProcessIdentify(UUID, socket);
                         }
                         else
                         {
-                            return Offline();
+                            return TCPDataSender.Offline();
                         }
                     }
                 case OperateCode.Offline:
@@ -44,23 +44,6 @@ namespace CardServerControl.Util
                     }
             }
             return null;
-        }
-
-        /// <summary>
-        /// 检查UUID是否合法
-        /// </summary>
-        private bool CheckUUID(string uuid)
-        {
-            string command = string.Format("SELECT * FROM account WHERE UUID = '{0}'", uuid);
-            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
-            if (ds.Tables[0].Rows.Count > 0)//UUID验证通过
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         /// <summary>
@@ -119,19 +102,6 @@ namespace CardServerControl.Util
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// 返回断线信息
-        /// 用于把用户踢出
-        /// </summary>
-        private GameData Offline()
-        {
-            GameData data = new GameData();
-            data.operateCode = OperateCode.Offline;
-            data.returnCode = ReturnCode.Refuse;
-
-            return data;
         }
     }
 }

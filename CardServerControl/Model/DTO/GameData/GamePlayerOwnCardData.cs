@@ -8,7 +8,7 @@ namespace CardServerControl.Model.DTO.GameData
     /// </summary>
     class GamePlayerOwnCardData : CommonDTO
     {
-        public int uid;
+        public int playerUid;
         public List<PlayerCard> cardInv;
 
         public GamePlayerOwnCardData()
