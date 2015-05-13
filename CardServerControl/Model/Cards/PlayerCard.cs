@@ -45,6 +45,7 @@ namespace CardServerControl.Model.Cards
             info.cardName = this.cardName;
             info.cardOwnerId = this.cardOwnerId;
             info.cardRarity = this.cardRarity;
+            info.cardLevel = this.cardLevel;
             info.health = this.GetHealth();
             info.energy = this.GetSpeed();
             info.attack = this.GetAttack();

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CardServerControl.Model.Cards;
 
 namespace CardServerControl.Model.DTO.GameData
 {

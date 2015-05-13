@@ -188,6 +188,7 @@ namespace CardServerControl.Util
                 cardInfo.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
                 cardInfo.cardRarity = UdpServer.Instance.cardManager.GetRarityByCardId(cardId);
                 cardInfo.cardName = UdpServer.Instance.cardManager.GetNameById(cardId);
+                cardInfo.cardLevel = Convert.ToInt32(row["CardLevel"]);
 
                 cardInfoList.Add(cardInfo);
             }
