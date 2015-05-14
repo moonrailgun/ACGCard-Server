@@ -110,12 +110,15 @@ namespace CardServerControl.Util
 
         /// <summary>
         /// 处理玩家召唤怪物到场上
+        /// 修改服务器本地场景内容
+        /// 将操作数据发送给双方
         /// </summary>
         private GameData ProcessSummonCharacter(GameData data, Socket socket)
         {
+            SummonCharacter detailData = JsonCoding<SummonCharacter>.decode(data.operateData);
             int roomID = data.roomID;
-            string cardUUID = data.operateData;
-
+            string cardUUID = detailData.cardUUID;
+            
             GameRoomManager grm = TcpServer.Instance.GetGameRoomManager();
             GameRoom room = grm.GetRoom(roomID);
 
@@ -127,22 +130,42 @@ namespace CardServerControl.Util
                     if (room.playerDataA.IsOwnCard(cardUUID))
                     {
                         //正常召唤
+                        foreach (CardInfo info in room.playerDataA.cardInv)
+                        {
+                            if (info.cardUUID == cardUUID)
+                            {
+                                room.playerDataA.AddCharacterCard(info);//添加到英雄区
+                                LogsSystem.Instance.Print(string.Format("A召唤{0}到场上", info.cardName));
+                                break;
+                            }
+                        }
                     }
                     else
                     {
                         //报错
+                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:"+cardUUID, LogLevel.ERROR);
                     }
                 }
                 else
                 {
                     //B
-                    if (room.playerDataA.IsOwnCard(cardUUID))
+                    if (room.playerDataB.IsOwnCard(cardUUID))
                     {
                         //正常召唤
+                        foreach (CardInfo info in room.playerDataB.cardInv)
+                        {
+                            if (info.cardUUID == cardUUID)
+                            {
+                                room.playerDataB.AddCharacterCard(info);//添加到英雄区
+                                LogsSystem.Instance.Print(string.Format("B召唤{0}到场上", info.cardName));
+                                break;
+                            }
+                        }
                     }
                     else
                     {
                         //报错
+                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:" + cardUUID, LogLevel.ERROR);
                     }
                 }
             }
@@ -151,7 +174,9 @@ namespace CardServerControl.Util
                 LogsSystem.Instance.Print(string.Format("出现异常:房间{0}内没有找到对应的socket链接", roomID), LogLevel.ERROR);
             }
 
-            return null;
+            room.SendOperateToAllPlayer(data);//将操作数据原样返回
+
+            return null;//把数据原样返回
         }
     }
 }

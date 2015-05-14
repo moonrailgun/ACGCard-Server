@@ -43,17 +43,28 @@ namespace CardServerControl.Model
         }
 
         /// <summary>
+        /// 将数据包发送给房间内两方玩家
+        /// 常用于数据操作
+        /// </summary>
+        /// <param name="data"></param>
+        public void SendOperateToAllPlayer(GameData data)
+        {
+            TcpServer.Instance.Send(playerSocketA.socket, data);
+            TcpServer.Instance.Send(playerSocketB.socket, data);
+        }
+
+        /// <summary>
         /// 游戏中玩家的信息
         /// </summary>
         public class GamePlayerData
         {
             private int characterPositionCounter = 0;
 
-            public Dictionary<PlayerCard, int> characterCard;//场上卡片<卡片对象，位置>
-            public List<Card> handCard;//手牌
+            public Dictionary<CardInfo, int> characterCard;//场上卡片<卡片对象，位置>
+            public List<CardInfo> handCard;//手牌
             public List<CardInfo> cardInv;//卡片背包
 
-            public void AddCharacterCard(PlayerCard card)
+            public void AddCharacterCard(CardInfo card)
             {
                 characterCard.Add(card, this.characterPositionCounter);
                 this.characterPositionCounter++;
