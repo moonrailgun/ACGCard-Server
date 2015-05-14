@@ -11,6 +11,7 @@ namespace CardServerControl.Model.Cards
     /// </summary>
     class Card: ICloneable
     {
+        public string cardUUID;
         public int cardId;
         public string cardName;
         public int cardRarity;

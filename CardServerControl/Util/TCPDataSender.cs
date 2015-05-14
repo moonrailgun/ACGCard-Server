@@ -14,10 +14,23 @@ namespace CardServerControl.Util
     {
         /// <summary>
         /// 根据玩家的UUID和UID
-        /// 发送玩家拥有的卡片
+        /// 发送玩家拥有的卡片(仅在此时创建卡片的UUID)
         /// </summary>
-        public GameData SendPlayerOwnCard(int uid, string UUID)
+        public GameData SendPlayerOwnCard(GameRoom room, GameRoom.PlayerPosition position)
         {
+            int uid;
+            string UUID;
+            if (position == GameRoom.PlayerPosition.A)//位置是A
+            {
+                uid = room.playerSocketA.playerInfo.playerUid;
+                UUID = room.playerSocketA.playerInfo.playerUUID;
+            }
+            else//位置是B
+            {
+                uid = room.playerSocketB.playerInfo.playerUid;
+                UUID = room.playerSocketB.playerInfo.playerUUID;
+            }
+
             if (CheckUUID(UUID))
             {
                 string command;
@@ -29,13 +42,14 @@ namespace CardServerControl.Util
 
                 //获取背包信息
                 data.cardInv = new List<CardInfo>();
-                command =  string.Format("SELECT * FROM cardinventory WHERE CardOwnerId = '{0}'",uid);
+                command = string.Format("SELECT * FROM cardinventory WHERE CardOwnerId = '{0}'", uid);
                 DataSet cardInventory = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
                 foreach (DataRow row in cardInventory.Tables[0].Rows)
                 {
                     try
                     {
                         PlayerCard playerCard = new PlayerCard();
+                        playerCard.cardUUID = System.Guid.NewGuid().ToString();//创建卡片的UUID作为唯一标识
                         playerCard.cardId = Convert.ToInt32(row["CardId"]);
                         playerCard.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
                         playerCard.cardLevel = Convert.ToInt32(row["CardLevel"]);
@@ -52,6 +66,9 @@ namespace CardServerControl.Util
                         LogsSystem.Instance.Print(ex.ToString(), LogLevel.WARN);
                     }
                 }
+
+                //将数据加载到本地内存
+                room.SetCardInv(data.cardInv, position);
 
                 //封装
                 GameData returnData = new GameData();

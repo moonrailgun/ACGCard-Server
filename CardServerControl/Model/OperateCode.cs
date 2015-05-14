@@ -12,5 +12,6 @@
         public const int Attack = 31;
         public const int UseSkill = 32;
         public const int PlayerOwnCard = 33;
+        public const int SummonCharacter = 34;
     }
 }

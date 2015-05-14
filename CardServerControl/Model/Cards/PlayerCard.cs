@@ -41,6 +41,7 @@ namespace CardServerControl.Model.Cards
         public CardInfo GetCardInfo()
         {
             CardInfo info = new CardInfo();
+            info.cardUUID = this.cardUUID;
             info.cardId = this.cardId;
             info.cardName = this.cardName;
             info.cardOwnerId = this.cardOwnerId;

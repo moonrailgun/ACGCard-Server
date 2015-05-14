@@ -8,6 +8,7 @@ namespace CardServerControl.Model
 {
     class CardInfo
     {
+        public string cardUUID;
         public int cardId;
         public int cardOwnerId;
         public string cardName;
