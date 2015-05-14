@@ -38,6 +38,10 @@ namespace CardServerControl.Util
                     {
                         return ProcessCancelMatching(JsonCoding<DisconnectDTO>.decode(data.operateData), socket);
                     }
+                case OperateCode.SummonCharacter:
+                    {
+                        return ProcessSummonCharacter(data, socket);
+                    }
                 default:
                     {
                         break;
@@ -99,6 +103,52 @@ namespace CardServerControl.Util
             {
                 //断开游戏，不退出大厅
                 PlayerManager.Instance.GamePlayerLogout(data.uid, socket);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 处理玩家召唤怪物到场上
+        /// </summary>
+        private GameData ProcessSummonCharacter(GameData data, Socket socket)
+        {
+            int roomID = data.roomID;
+            string cardUUID = data.operateData;
+
+            GameRoomManager grm = TcpServer.Instance.GetGameRoomManager();
+            GameRoom room = grm.GetRoom(roomID);
+
+            if (room.playerSocketA.socket == socket || room.playerSocketB.socket == socket)
+            {
+                if (room.playerSocketA.socket == socket)
+                {
+                    //A
+                    if (room.playerDataA.IsOwnCard(cardUUID))
+                    {
+                        //正常召唤
+                    }
+                    else
+                    {
+                        //报错
+                    }
+                }
+                else
+                {
+                    //B
+                    if (room.playerDataA.IsOwnCard(cardUUID))
+                    {
+                        //正常召唤
+                    }
+                    else
+                    {
+                        //报错
+                    }
+                }
+            }
+            else
+            {
+                LogsSystem.Instance.Print(string.Format("出现异常:房间{0}内没有找到对应的socket链接", roomID), LogLevel.ERROR);
             }
 
             return null;
