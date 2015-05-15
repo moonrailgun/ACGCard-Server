@@ -58,13 +58,13 @@ namespace CardServerControl.Model
         /// </summary>
         public class GamePlayerData
         {
-            public Dictionary<CardInfo, string> characterCard;//场上卡片<卡片对象，卡片UUID>
+            public Dictionary<string,CardInfo> characterCard;//场上卡片<卡片UUID,卡片对象>------------------------------这里结构有问题。不能用CardInfo对象
             public List<CardInfo> handCard;//手牌
             public List<CardInfo> cardInv;//卡片背包
 
             public void AddCharacterCard(CardInfo card)
             {
-                characterCard.Add(card, card.cardUUID);
+                characterCard.Add( card.cardUUID,card);
             }
 
             public bool IsOwnCard(string UUID)
@@ -77,6 +77,11 @@ namespace CardServerControl.Model
                     }
                 }
                 return false;
+            }
+
+            public CardInfo GetCharacterCardByCardUUID(string CardUUID)
+            {
+                return characterCard[CardUUID];
             }
         }
 

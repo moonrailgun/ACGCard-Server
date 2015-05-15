@@ -42,6 +42,10 @@ namespace CardServerControl.Util
                     {
                         return ProcessSummonCharacter(data, socket);
                     }
+                case OperateCode.Attack:
+                    {
+                        return ProcessCommonAttack(data, socket);
+                    }
                 default:
                     {
                         break;
@@ -118,7 +122,7 @@ namespace CardServerControl.Util
             SummonCharacterData detailData = JsonCoding<SummonCharacterData>.decode(data.operateData);
             int roomID = data.roomID;
             string cardUUID = detailData.cardUUID;
-            
+
             GameRoomManager grm = TcpServer.Instance.GetGameRoomManager();
             GameRoom room = grm.GetRoom(roomID);
 
@@ -143,7 +147,7 @@ namespace CardServerControl.Util
                     else
                     {
                         //报错
-                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:"+cardUUID, LogLevel.ERROR);
+                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:" + cardUUID, LogLevel.ERROR);
                     }
                 }
                 else
@@ -178,6 +182,42 @@ namespace CardServerControl.Util
             room.SendOperateToAllPlayer(data);//将操作数据原样返回
 
             return null;//把数据原样返回
+        }
+
+        /// <summary>
+        /// 处理普通攻击
+        /// 将本地数据进行处理
+        /// 拆包后添加入伤害值返回
+        /// </summary>
+        private GameData ProcessCommonAttack(GameData data, Socket socket)
+        {
+            AttackData detailData = JsonCoding<AttackData>.decode(data.operateData);
+            GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(data.roomID);
+
+            //获取伤害值
+            string fromCardUUID = detailData.fromCardUUID;
+            string toCardUUID = detailData.toCardUUID;
+            int operatePlayerPosition = detailData.operatePlayerPosition;
+            int damage = 0;
+            if (room.playerDataA.IsOwnCard(fromCardUUID))
+            {
+                damage = room.playerDataA.characterCard[fromCardUUID].attack;
+                room.playerDataB.characterCard[toCardUUID].health -= damage;//伤害扣血
+            }
+            else if (room.playerDataB.IsOwnCard(fromCardUUID))
+            {
+                damage = room.playerDataB.characterCard[fromCardUUID].attack;
+                room.playerDataA.characterCard[toCardUUID].health -= damage;//伤害扣血
+            }
+            else
+            {
+                LogsSystem.Instance.Print("场上未找到发起攻击的卡片");
+            }
+            detailData.damage = damage;
+
+            data.operateData = JsonCoding<AttackData>.encode(detailData);//将修改过的数据压回去
+            room.SendOperateToAllPlayer(data);
+            return null;
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CardServerControl.Model.DTO.GameData
+﻿namespace CardServerControl.Model.DTO.GameData
 {
-    class AttackData
+    class AttackData : GameDetailData
     {
+        public string fromCardUUID;
+        public string toCardUUID;
+        public int damage;
     }
 }
