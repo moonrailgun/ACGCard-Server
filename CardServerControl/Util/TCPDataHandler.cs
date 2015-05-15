@@ -115,7 +115,7 @@ namespace CardServerControl.Util
         /// </summary>
         private GameData ProcessSummonCharacter(GameData data, Socket socket)
         {
-            SummonCharacter detailData = JsonCoding<SummonCharacter>.decode(data.operateData);
+            SummonCharacterData detailData = JsonCoding<SummonCharacterData>.decode(data.operateData);
             int roomID = data.roomID;
             string cardUUID = detailData.cardUUID;
             
@@ -173,6 +173,7 @@ namespace CardServerControl.Util
             {
                 LogsSystem.Instance.Print(string.Format("出现异常:房间{0}内没有找到对应的socket链接", roomID), LogLevel.ERROR);
             }
+
 
             room.SendOperateToAllPlayer(data);//将操作数据原样返回
 

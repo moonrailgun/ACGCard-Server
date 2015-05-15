@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CardServerControl.Model.DTO.GameData
 {
-    class SummonCharacter:GameDetailData
+    class SummonCharacterData : GameDetailData
     {
         public string cardUUID;
         public CardInfo cardInfo;

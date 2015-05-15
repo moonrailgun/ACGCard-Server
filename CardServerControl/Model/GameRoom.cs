@@ -58,16 +58,13 @@ namespace CardServerControl.Model
         /// </summary>
         public class GamePlayerData
         {
-            private int characterPositionCounter = 0;
-
-            public Dictionary<CardInfo, int> characterCard;//场上卡片<卡片对象，位置>
+            public Dictionary<CardInfo, string> characterCard;//场上卡片<卡片对象，卡片UUID>
             public List<CardInfo> handCard;//手牌
             public List<CardInfo> cardInv;//卡片背包
 
             public void AddCharacterCard(CardInfo card)
             {
-                characterCard.Add(card, this.characterPositionCounter);
-                this.characterPositionCounter++;
+                characterCard.Add(card, card.cardUUID);
             }
 
             public bool IsOwnCard(string UUID)
