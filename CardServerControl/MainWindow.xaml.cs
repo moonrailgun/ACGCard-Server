@@ -9,6 +9,7 @@ using System.Windows.Input;
 using CardServerControl.Model;
 using CardServerControl.Model.DTO;
 using CardServerControl.Util;
+using CardServerControl.Model.Cards;
 
 namespace CardServerControl
 {
@@ -82,6 +83,45 @@ namespace CardServerControl
             else if (args[0] == "list")
             {
                 ShowPlayerList(null, null);
+            }
+            else if (args[0] == "room")
+            {
+                if (args[1] == "detail")
+                {
+                    try
+                    {
+                        int roomID = Convert.ToInt32(args[2]);
+
+                        GameRoomManager grm = TcpServer.Instance.GetGameRoomManager();
+                        GameRoom room = grm.GetRoom(roomID);
+                        if (room != null)
+                        {
+                            string showTXT = "";
+                            showTXT += "\n\t房间ID:" + room.roomID + "\n";
+                            showTXT += string.Format("\t对战双方: {0}({1}) - {2}({3})\n", room.playerSocketA.playerInfo.playerName, room.playerSocketA.playerInfo.playerUid, room.playerSocketB.playerInfo.playerName, room.playerSocketB.playerInfo.playerUid);
+                            showTXT += "\tA方卡片背包列表:\n";
+                            foreach (PlayerCard playerCard in room.playerDataA.characterCardInv)
+                            {
+                                showTXT += string.Format("\t\t{0}({1}-{2}-{3}-{4})\n", playerCard.cardName, playerCard.cardId, playerCard.cardLevel, playerCard.GetHealth(), playerCard.GetEnergy());
+                            }
+                            showTXT += "\tB方卡片背包列表:\n";
+                            foreach (PlayerCard playerCard in room.playerDataB.characterCardInv)
+                            {
+                                showTXT += string.Format("\t\t{0}({1}-{2}-{3}-{4})", playerCard.cardName, playerCard.cardId, playerCard.cardLevel, playerCard.GetHealth(), playerCard.GetEnergy());
+                            }
+                            showTXT += "...";
+                            logsSystem.Print(showTXT);
+                        }
+                        else
+                        {
+                            logsSystem.Print("房间号不存在", LogLevel.WARN);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logsSystem.Print("出现异常，可是能输入的命令不合法:" + ex.ToString(), LogLevel.WARN);
+                    }
+                }
             }
             else if (args[0] == "rooms")
             {

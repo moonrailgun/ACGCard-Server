@@ -30,15 +30,15 @@ namespace CardServerControl.Model
         /// <summary>
         /// 设置卡片背包列表
         /// </summary>
-        public void SetCardInv(List<CardInfo> cardInv, PlayerPosition position)
+        public void SetCardInv(List<PlayerCard> cardInv, PlayerPosition position)
         {
             if (position == PlayerPosition.A)//A
             {
-                playerDataA.cardInv = cardInv;
+                playerDataA.characterCardInv = cardInv;
             }
             else//B
             {
-                playerDataB.cardInv = cardInv;
+                playerDataB.characterCardInv = cardInv;
             }
         }
 
@@ -58,18 +58,28 @@ namespace CardServerControl.Model
         /// </summary>
         public class GamePlayerData
         {
-            public Dictionary<string,CardInfo> characterCard;//场上卡片<卡片UUID,卡片对象>------------------------------这里结构有问题。不能用CardInfo对象
+            public Dictionary<string, PlayerCard> characterCard;//场上卡片<卡片UUID,卡片对象>
             public List<CardInfo> handCard;//手牌
-            public List<CardInfo> cardInv;//卡片背包
+            public List<PlayerCard> characterCardInv;//角色卡片背包
 
-            public void AddCharacterCard(CardInfo card)
+            /// <summary>
+            /// 初始化
+            /// </summary>
+            public GamePlayerData()
             {
-                characterCard.Add( card.cardUUID,card);
+                this.characterCard = new Dictionary<string, PlayerCard>();
+                this.handCard = new List<CardInfo>();
+                this.characterCardInv = new List<PlayerCard>();
+            }
+
+            public void AddPlayerCard(PlayerCard card)
+            {
+                characterCard.Add(card.cardUUID, card);
             }
 
             public bool IsOwnCard(string UUID)
             {
-                foreach (CardInfo info in cardInv)
+                foreach (PlayerCard info in characterCardInv)
                 {
                     if (info.cardUUID == UUID)
                     {
@@ -79,7 +89,10 @@ namespace CardServerControl.Model
                 return false;
             }
 
-            public CardInfo GetCharacterCardByCardUUID(string CardUUID)
+            /// <summary>
+            /// 根据UUID返回角色卡片
+            /// </summary>
+            public PlayerCard GetPlayerCardByCardUUID(string CardUUID)
             {
                 return characterCard[CardUUID];
             }

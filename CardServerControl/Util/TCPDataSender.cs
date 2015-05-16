@@ -34,7 +34,8 @@ namespace CardServerControl.Util
             if (CheckUUID(UUID))
             {
                 string command;
-                CardManager cardManager = UdpServer.Instance.cardManager;
+                List<PlayerCard> playerCardList = new List<PlayerCard>();
+                CardManager cardManager = CardManager.Instance;
 
                 //用户数据获取
                 GamePlayerOwnCardData data = new GamePlayerOwnCardData();
@@ -60,6 +61,7 @@ namespace CardServerControl.Util
 
                         CardInfo cardInfo = playerCard.GetCardInfo();
                         data.cardInv.Add(cardInfo);//添加到列表
+                        playerCardList.Add(playerCard);//添加卡片
                     }
                     catch (Exception ex)
                     {
@@ -68,7 +70,7 @@ namespace CardServerControl.Util
                 }
 
                 //将数据加载到本地内存
-                room.SetCardInv(data.cardInv, position);
+                room.SetCardInv(playerCardList, position);
 
                 //封装
                 GameData returnData = new GameData();

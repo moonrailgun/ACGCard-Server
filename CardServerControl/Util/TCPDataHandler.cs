@@ -5,6 +5,7 @@ using System;
 using System.Data;
 using System.Net.Sockets;
 using System.Net;
+using CardServerControl.Model.Cards;
 
 namespace CardServerControl.Util
 {
@@ -134,12 +135,12 @@ namespace CardServerControl.Util
                     if (room.playerDataA.IsOwnCard(cardUUID))
                     {
                         //正常召唤
-                        foreach (CardInfo info in room.playerDataA.cardInv)
+                        foreach (PlayerCard playerCard in room.playerDataA.characterCardInv)
                         {
-                            if (info.cardUUID == cardUUID)
+                            if (playerCard.cardUUID == cardUUID)
                             {
-                                room.playerDataA.AddCharacterCard(info);//添加到英雄区
-                                LogsSystem.Instance.Print(string.Format("A召唤{0}到场上", info.cardName));
+                                room.playerDataA.AddPlayerCard(playerCard);//添加到英雄区
+                                LogsSystem.Instance.Print(string.Format("A召唤{0}到场上", playerCard.cardName));
                                 break;
                             }
                         }
@@ -156,12 +157,12 @@ namespace CardServerControl.Util
                     if (room.playerDataB.IsOwnCard(cardUUID))
                     {
                         //正常召唤
-                        foreach (CardInfo info in room.playerDataB.cardInv)
+                        foreach (PlayerCard playerCard in room.playerDataB.characterCardInv)
                         {
-                            if (info.cardUUID == cardUUID)
+                            if (playerCard.cardUUID == cardUUID)
                             {
-                                room.playerDataB.AddCharacterCard(info);//添加到英雄区
-                                LogsSystem.Instance.Print(string.Format("B召唤{0}到场上", info.cardName));
+                                room.playerDataB.AddPlayerCard(playerCard);//添加到英雄区
+                                LogsSystem.Instance.Print(string.Format("B召唤{0}到场上", playerCard.cardName));
                                 break;
                             }
                         }
@@ -201,13 +202,13 @@ namespace CardServerControl.Util
             int damage = 0;
             if (room.playerDataA.IsOwnCard(fromCardUUID))
             {
-                damage = room.playerDataA.characterCard[fromCardUUID].attack;
-                room.playerDataB.characterCard[toCardUUID].health -= damage;//伤害扣血
+                damage = room.playerDataA.GetPlayerCardByCardUUID(fromCardUUID).GetAttack();//获取攻击力
+                room.playerDataB.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
             }
             else if (room.playerDataB.IsOwnCard(fromCardUUID))
             {
-                damage = room.playerDataB.characterCard[fromCardUUID].attack;
-                room.playerDataA.characterCard[toCardUUID].health -= damage;//伤害扣血
+                damage = room.playerDataB.GetPlayerCardByCardUUID(fromCardUUID).GetAttack();//获取攻击力
+                room.playerDataA.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
             }
             else
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardServerControl.Model.Cards
 {
-    class PlayerCard : Card
+    class PlayerCard : CharacterCard
     {
         public int cardOwnerId;
         public int cardLevel;
@@ -14,6 +14,10 @@ namespace CardServerControl.Model.Cards
         public int specialEnergy;
         public int specialAttack;
         public int specialSpeed;
+        public int currentHealth;
+        public int currentEnergy;
+        public int maxHealth;
+        public int maxEnergy;
 
         #region 属性获取
         public int GetHealth()
@@ -38,6 +42,19 @@ namespace CardServerControl.Model.Cards
         }
         #endregion
 
+        public void SetPlayerCardInfo(int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
+        {
+            this.cardOwnerId = cardOwnerId;
+            this.cardLevel = cardLevel;
+            this.specialHealth = specialHealth;
+            this.specialEnergy = specialEnergy;
+            this.specialAttack = specialAttack;
+            this.specialSpeed = specialSpeed;
+
+            this.maxHealth = this.currentHealth = this.GetHealth();
+            this.maxEnergy = this.currentHealth = this.GetEnergy();
+        }
+
         public CardInfo GetCardInfo()
         {
             CardInfo info = new CardInfo();
@@ -53,6 +70,48 @@ namespace CardServerControl.Model.Cards
             info.speed = this.GetSpeed();
 
             return info;
+        }
+
+        /// <summary>
+        /// 获得伤害
+        /// </summary>
+        public void GetDamage(int damageValue)
+        {
+            this.currentHealth -= damageValue;
+            LogsSystem.Instance.Print(string.Format("角色{0}受到了{1}点伤害",this.cardName, damageValue));
+        }
+
+        /// <summary>
+        /// 根据卡片ID获取卡片数据
+        /// </summary>
+        public static PlayerCard GetPlayerCardDataByID(int cardID)
+        {
+            CharacterCard character = CardManager.Instance.GetCardCloneByID(cardID);
+            PlayerCard playerCard = new PlayerCard();
+            playerCard.cardUUID = character.cardUUID;
+            playerCard.cardId = character.cardId;
+            playerCard.cardName = character.cardName;
+            playerCard.cardRarity = character.cardRarity;
+            playerCard.baseHealth = character.baseHealth;
+            playerCard.baseEnergy = character.baseEnergy;
+            playerCard.baseAttack = character.baseAttack;
+            playerCard.baseSpeed = character.baseSpeed;
+            playerCard.growHealth = character.growHealth;
+            playerCard.growEnergy = character.growEnergy;
+            playerCard.growAttack = character.growAttack;
+            playerCard.growSpeed = character.growSpeed;
+
+            return playerCard;
+        }
+        /// <summary>
+        /// 根据卡片ID获取卡片数据
+        /// </summary>
+        public static PlayerCard GetPlayerCardDataByID(int cardID, int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
+        {
+            PlayerCard playerCard = GetPlayerCardDataByID(cardID);
+            playerCard.SetPlayerCardInfo(cardOwnerId,  cardLevel,  specialHealth,  specialEnergy,  specialAttack,  specialSpeed);
+
+            return playerCard;
         }
     }
 }

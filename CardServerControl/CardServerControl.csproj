@@ -81,6 +81,7 @@
     <Compile Include="GameRoomManager.cs" />
     <Compile Include="Model\AreaCode.cs" />
     <Compile Include="Model\Cards\Card.cs" />
+    <Compile Include="Model\Cards\CharacterCard.cs" />
     <Compile Include="Model\CardInfo.cs" />
     <Compile Include="Model\Cards\PlayerCard.cs" />
     <Compile Include="Model\DTO\CardInfoDTO.cs" />

@@ -42,7 +42,7 @@ namespace CardServerControl
             this.sendClient = new UdpClient();
             log = LogsSystem.Instance;
             pp = new PacketProcess();
-            cardManager = new CardManager();
+            cardManager = CardManager.Instance;
         }
 
         public void Connect()

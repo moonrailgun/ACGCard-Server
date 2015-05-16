@@ -11,13 +11,28 @@ namespace CardServerControl
 {
     class CardManager
     {
-        public List<Card> cardList;
+        #region 单例模式
+        private static CardManager _instance;
+        public static CardManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new CardManager();
+                }
+                return _instance;
+            }
+        }
+        #endregion
+
+        public Dictionary<int, CharacterCard> characterCardMap;
 
         public CardManager()
         {
             try
             {
-                cardList = new List<Card>();
+                characterCardMap = new Dictionary<int, CharacterCard>();
 
                 string command = "SELECT * FROM card ORDER BY CardId";
                 DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
@@ -26,20 +41,21 @@ namespace CardServerControl
                 {
                     try
                     {
-                        Card card = new Card();
-                        card.cardId = Convert.ToInt32(row["CardId"]);
-                        card.cardName = row["CardName"].ToString();
-                        card.cardRarity = Convert.ToInt32(row["CardRarity"]);
-                        card.baseHealth = Convert.ToInt32(row["BaseHealth"]);
-                        card.baseEnergy = Convert.ToInt32(row["BaseEnergy"]);
-                        card.baseAttack = Convert.ToInt32(row["BaseAttack"]);
-                        card.baseSpeed = Convert.ToInt32(row["BaseSpeed"]);
-                        card.growHealth = Convert.ToInt32(row["GrowHealth"]);
-                        card.growEnergy = Convert.ToInt32(row["GrowEnergy"]);
-                        card.growAttack = Convert.ToInt32(row["GrowAttack"]);
-                        card.growSpeed = Convert.ToInt32(row["GrowSpeed"]);
+                        //从数据库中取值
+                        CharacterCard characterCard = new CharacterCard();
+                        characterCard.cardId = Convert.ToInt32(row["CardId"]);
+                        characterCard.cardName = row["CardName"].ToString();
+                        characterCard.cardRarity = Convert.ToInt32(row["CardRarity"]);
+                        characterCard.baseHealth = Convert.ToInt32(row["BaseHealth"]);
+                        characterCard.baseEnergy = Convert.ToInt32(row["BaseEnergy"]);
+                        characterCard.baseAttack = Convert.ToInt32(row["BaseAttack"]);
+                        characterCard.baseSpeed = Convert.ToInt32(row["BaseSpeed"]);
+                        characterCard.growHealth = Convert.ToInt32(row["GrowHealth"]);
+                        characterCard.growEnergy = Convert.ToInt32(row["GrowEnergy"]);
+                        characterCard.growAttack = Convert.ToInt32(row["GrowAttack"]);
+                        characterCard.growSpeed = Convert.ToInt32(row["GrowSpeed"]);
 
-                        cardList.Add(card);
+                        characterCardMap.Add(characterCard.cardId, characterCard);
                     }
                     catch (Exception ex)
                     {
@@ -57,38 +73,36 @@ namespace CardServerControl
 
         public int GetRarityByCardId(int cardId)
         {
-            foreach (Card card in cardList)
+            CharacterCard character = characterCardMap[cardId];
+            if (character != null)
             {
-                if (card.cardId == cardId)
-                {
-                    return card.cardRarity;
-                }
+                return character.cardRarity;
             }
-            return 0;
+            else
+            {
+                return 0;
+            }
         }
 
         public string GetNameById(int cardId)
         {
-            foreach (Card card in cardList)
+            CharacterCard character = characterCardMap[cardId];
+            if (character != null)
             {
-                if (card.cardId == cardId)
-                {
-                    return card.cardName;
-                }
+                return character.cardName;
             }
-            return "";
+            else
+            {
+                return "";
+            }
         }
 
-        public Card GetCardByID(int cardId)
+        /// <summary>
+        /// 根据ID获取卡片的克隆
+        /// </summary>
+        public CharacterCard GetCardCloneByID(int cardId)
         {
-            foreach (Card card in cardList)
-            {
-                if (card.cardId == cardId)
-                {
-                    return card.Clone() as Card;
-                }
-            }
-            return null;
+            return characterCardMap[cardId].Clone() as CharacterCard;
         }
     }
 }
