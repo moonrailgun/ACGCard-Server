@@ -47,6 +47,10 @@ namespace CardServerControl.Util
                     {
                         return ProcessCommonAttack(data, socket);
                     }
+                case OperateCode.PlayerOwnCard:
+                    {
+                        return ProcessPlayerOwnCard(data, socket);
+                    }
                 default:
                     {
                         break;
@@ -219,6 +223,25 @@ namespace CardServerControl.Util
             data.operateData = JsonCoding<AttackData>.encode(detailData);//将修改过的数据压回去
             room.SendOperateToAllPlayer(data);
             return null;
+        }
+
+        /// <summary>
+        /// 处理对卡片背包的请求
+        /// </summary>
+        private GameData ProcessPlayerOwnCard(GameData data, Socket socket)
+        {
+            GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(data.roomID);
+            GamePlayerOwnCardData detail = JsonCoding<GamePlayerOwnCardData>.decode(data.operateData);
+
+            if (room != null)
+            {
+                return TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(detail, room);
+            }
+            else
+            {
+                LogsSystem.Instance.Print("房间号不合法", LogLevel.WARN);
+                return null;
+            }
         }
     }
 }

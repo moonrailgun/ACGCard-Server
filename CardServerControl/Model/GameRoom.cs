@@ -99,6 +99,6 @@ namespace CardServerControl.Model
         }
 
         public enum PlayerPosition
-        { A, B }
+        { A = 0, B = 1 }
     }
 }

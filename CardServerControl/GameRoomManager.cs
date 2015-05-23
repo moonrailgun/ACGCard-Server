@@ -35,12 +35,14 @@ namespace CardServerControl
             GameRoom newroom = new GameRoom(roomID, playerSocketA, playerSocketB);
             rooms.Add(newroom);
             availableRoomID++;
-
+            
+            /*
             //对playerA发送的卡片信息
             TcpServer.Instance.Send(playerSocketA.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(newroom, GameRoom.PlayerPosition.A));
             //对playerB发送的卡片信息
             TcpServer.Instance.Send(playerSocketB.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(newroom, GameRoom.PlayerPosition.B));
-
+            */
+            
             //发送数据,让客户端建立房间
             //通用数据
             GameData roomData = new GameData();

@@ -5,9 +5,8 @@ namespace CardServerControl.Model.DTO.GameData
     /// <summary>
     /// 卡片背包
     /// </summary>
-    class GamePlayerOwnCardData : CommonDTO
+    class GamePlayerOwnCardData : GameDetailData
     {
-        public int playerUid;
         public List<CardInfo> cardInv;
     }
 }

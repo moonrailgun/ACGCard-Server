@@ -16,20 +16,11 @@ namespace CardServerControl.Util
         /// 根据玩家的UUID和UID
         /// 发送玩家拥有的卡片(仅在此时创建卡片的UUID)
         /// </summary>
-        public GameData SendPlayerOwnCard(GameRoom room, GameRoom.PlayerPosition position)
+        public GameData SendPlayerOwnCard(GamePlayerOwnCardData requestData,GameRoom room)
         {
-            int uid;
-            string UUID;
-            if (position == GameRoom.PlayerPosition.A)//位置是A
-            {
-                uid = room.playerSocketA.playerInfo.playerUid;
-                UUID = room.playerSocketA.playerInfo.playerUUID;
-            }
-            else//位置是B
-            {
-                uid = room.playerSocketB.playerInfo.playerUid;
-                UUID = room.playerSocketB.playerInfo.playerUUID;
-            }
+            int uid = requestData.operatePlayerUid;
+            string UUID = requestData.operatePlayerUUID;
+            GameRoom.PlayerPosition position = (GameRoom.PlayerPosition)requestData.operatePlayerPosition;
 
             if (CheckUUID(UUID))
             {
@@ -37,12 +28,8 @@ namespace CardServerControl.Util
                 List<PlayerCard> playerCardList = new List<PlayerCard>();
                 CardManager cardManager = CardManager.Instance;
 
-                //用户数据获取
-                GamePlayerOwnCardData data = new GamePlayerOwnCardData();
-                data.playerUid = uid;
-
                 //获取背包信息
-                data.cardInv = new List<CardInfo>();
+                requestData.cardInv = new List<CardInfo>();
                 command = string.Format("SELECT * FROM cardinventory WHERE CardOwnerId = '{0}'", uid);
                 DataSet cardInventory = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
                 foreach (DataRow row in cardInventory.Tables[0].Rows)
@@ -60,7 +47,7 @@ namespace CardServerControl.Util
                         playerCard.specialSpeed = Convert.ToInt32(row["SpecialSpeed"]);
 
                         CardInfo cardInfo = playerCard.GetCardInfo();
-                        data.cardInv.Add(cardInfo);//添加到列表
+                        requestData.cardInv.Add(cardInfo);//添加到列表
                         playerCardList.Add(playerCard);//添加卡片
                     }
                     catch (Exception ex)
@@ -77,7 +64,7 @@ namespace CardServerControl.Util
                 returnData.operateCode = OperateCode.PlayerOwnCard;
                 returnData.roomID = -1;
                 returnData.returnCode = ReturnCode.Success;
-                returnData.operateData = JsonCoding<GamePlayerOwnCardData>.encode(data);
+                returnData.operateData = JsonCoding<GamePlayerOwnCardData>.encode(requestData);
 
                 return returnData;
             }
