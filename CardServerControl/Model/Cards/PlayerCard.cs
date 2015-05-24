@@ -1,11 +1,13 @@
-﻿using System;
+﻿using CardServerControl.Model.Skills.ContinuedSkill;
+using CardServerControl.Model.Skills;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CardServerControl.Model.Cards
 {
+    /// <summary>
+    /// 角色卡片对象
+    /// </summary>
     class PlayerCard : CharacterCard
     {
         public int cardOwnerId;
@@ -18,6 +20,9 @@ namespace CardServerControl.Model.Cards
         public int currentEnergy;
         public int maxHealth;
         public int maxEnergy;
+
+        protected List<Skill> cardOwnSkill = new List<Skill>();
+        protected List<StateSkill> PlayerCardState = new List<StateSkill>();
 
         #region 属性获取
         public int GetHealth()
@@ -52,7 +57,7 @@ namespace CardServerControl.Model.Cards
             this.specialSpeed = specialSpeed;
 
             this.maxHealth = this.currentHealth = this.GetHealth();
-            this.maxEnergy = this.currentHealth = this.GetEnergy();
+            this.maxEnergy = this.currentEnergy = this.GetEnergy();
         }
 
         public CardInfo GetCardInfo()
@@ -79,6 +84,12 @@ namespace CardServerControl.Model.Cards
         {
             this.currentHealth -= damageValue;
             LogsSystem.Instance.Print(string.Format("角色{0}受到了{1}点伤害",this.cardName, damageValue));
+        }
+
+        public void AppendState(StateSkill state)
+        {
+            this.PlayerCardState.Add(state);
+            LogsSystem.Instance.Print(string.Format("卡片{0}获得了状态{1}", this.cardName, state.skillName), LogLevel.GAMEDETAIL);
         }
 
         /// <summary>
