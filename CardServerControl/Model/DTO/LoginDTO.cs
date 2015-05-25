@@ -13,6 +13,9 @@ namespace CardServerControl.Model.DTO
         public string playerName;
         public string UUID;
 
+        public string internalVersion;//内部版本号
+        public string officialVersion;//正式版本号
+
         public LoginDTO()
             :base()
         {

@@ -64,7 +64,26 @@ namespace CardServerControl.Util
                     PlayerManager.Instance.PlayerLoginLobby(uid, playerName, uuid, iped);
 
                     //构造返回数据
-                    model.returnCode = ReturnCode.Success;
+                    if (data.internalVersion == MainWindow.instance.internalVersion)
+                    {
+                        //内部版本号一致
+                        model.returnCode = ReturnCode.Success;
+                    }
+                    else
+                    {
+                        if (data.officialVersion == MainWindow.instance.officialVersion)
+                        {
+                            //外部版本号一致
+                            model.returnCode = ReturnCode.Pass;
+                        }
+                        else
+                        {
+                            //外部版本号不一致
+                            model.returnCode = ReturnCode.Repeal;
+                        }
+                    }
+
+                    
                     LoginDTO returnData = new LoginDTO();
                     returnData.account = data.account;
                     returnData.password = data.password;

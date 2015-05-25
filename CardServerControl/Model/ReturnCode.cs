@@ -13,5 +13,6 @@ namespace CardServerControl.Model
         public const int Refuse = 40;//拒绝就是不经过验证。服务器直接拒绝请求
         public const int Repeal = 80;
         public const int Request = 1;
+        public const int Pass = 2;
     }
 }

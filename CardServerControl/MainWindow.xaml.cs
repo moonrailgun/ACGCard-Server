@@ -18,6 +18,11 @@ namespace CardServerControl
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region 版本信息
+        public string internalVersion = "2015052502";//内部版本号
+        public string officialVersion = "V0.1Beta";//正式版本号
+        #endregion
+
         public static MainWindow instance;
         private LogsSystem logsSystem;
         public MainWindow()
@@ -178,6 +183,10 @@ namespace CardServerControl
                         logsSystem.Print("请输入玩家的Uid" + ex.ToString());
                     }
                 }
+            }
+            else if (args[0] == "version")
+            {
+                ShowVersionInfo(null, null);
             }
             else if (args[0] == "help")
             {
@@ -346,5 +355,13 @@ namespace CardServerControl
             }
         }
         #endregion
+
+        /// <summary>
+        /// 显示版本信息
+        /// </summary>
+        private void ShowVersionInfo(object sender, RoutedEventArgs e)
+        {
+            logsSystem.Print(string.Format("\n\t当前版本信息：\n\t\t内部版本号：{0}\n\t\t正式版本号：{1}", internalVersion, officialVersion));
+        }
     }
 }

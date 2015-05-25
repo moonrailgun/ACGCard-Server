@@ -216,17 +216,20 @@ namespace CardServerControl
         /// <param name="fromPort">接受的本地端口</param>
         private void ProcessReceiveMessage(byte[] messageBytes, Socket socket)
         {
-            //获取收到的数据
-            string message = encoding.GetString(messageBytes);
-            LogsSystem.Instance.Print(string.Format("[FROM {0}]:{1}", socket.RemoteEndPoint, message));
-
-            //转换数据
-            GameData data = JsonCoding<GameData>.decode(message);
-            GameData returnData = tcpDH.ProcessTcpData(data, socket);
-            if (returnData != null)
+            if (messageBytes.Length > 0)
             {
-                string returnMessage = JsonCoding<GameData>.encode(returnData);
-                Send(socket, encoding.GetBytes(returnMessage));
+                //获取收到的数据
+                string message = encoding.GetString(messageBytes);
+                LogsSystem.Instance.Print(string.Format("[FROM {0}]:{1}", socket.RemoteEndPoint, message));
+
+                //转换数据
+                GameData data = JsonCoding<GameData>.decode(message);
+                GameData returnData = tcpDH.ProcessTcpData(data, socket);
+                if (returnData != null)
+                {
+                    string returnMessage = JsonCoding<GameData>.encode(returnData);
+                    Send(socket, encoding.GetBytes(returnMessage));
+                }
             }
         }
         #endregion
