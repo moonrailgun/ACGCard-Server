@@ -66,16 +66,33 @@ namespace CardServerControl
             {
                 PlayerSocket playerSocket = target as PlayerSocket;
 
-                GameData data = new GameData();
-                data.operateCode = OperateCode.HeartBeat;
-                data.operateData = JsonCoding<CommonDTO>.encode(new CommonDTO());
+                if (playerSocket.socket.Connected)
+                {
+                    GameData data = new GameData();
+                    data.operateCode = OperateCode.HeartBeat;
+                    data.operateData = JsonCoding<CommonDTO>.encode(new CommonDTO());
 
-                TcpServer.Instance.Send(playerSocket.socket, data);
+                    TcpServer.Instance.Send(playerSocket.socket, data);
+                }
+                else
+                {
+                    //断线
+                    RemoveHeartBeatObject(playerSocket);//移除对象
+                }
+                
             }
             else
             {
                 LogsSystem.Instance.Print("计时器回调函数接受数据异常，计时器无法正常工作:" + target, LogLevel.ERROR);
             }
+        }
+
+        /// <summary>
+        /// 立刻发送心跳包
+        /// </summary>
+        public void SendHeartBeatPackageImmediately(Socket target)
+        {
+            SendHeartBeatPackage(target);
         }
 
         /// <summary>

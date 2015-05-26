@@ -35,14 +35,14 @@ namespace CardServerControl
             GameRoom newroom = new GameRoom(roomID, playerSocketA, playerSocketB);
             rooms.Add(newroom);
             availableRoomID++;
-            
+
             /*
             //对playerA发送的卡片信息
             TcpServer.Instance.Send(playerSocketA.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(newroom, GameRoom.PlayerPosition.A));
             //对playerB发送的卡片信息
             TcpServer.Instance.Send(playerSocketB.socket, TcpServer.Instance.GetTCPDataSender().SendPlayerOwnCard(newroom, GameRoom.PlayerPosition.B));
             */
-            
+
             //发送数据,让客户端建立房间
             //通用数据
             GameData roomData = new GameData();
@@ -102,18 +102,65 @@ namespace CardServerControl
         /// </summary>
         private void TryAllocRoom()
         {
+            CheckFreePlayerList();
+
             LogsSystem.Instance.Print("尝试分配房间,当前等待人数:" + freedomPlayer.Count);
             if (freedomPlayer.Count >= 2)
             {
                 PlayerSocket playerSocketA, playerSocketB;
 
-                //简单匹配，之后修改
-                playerSocketA = freedomPlayer[0];
-                playerSocketB = freedomPlayer[1];
+                //简单匹配，之后修改。。直接获取排在前面的连接
+                playerSocketA = GetAvailableTCPConnect();
                 freedomPlayer.Remove(playerSocketA);
+                playerSocketB = GetAvailableTCPConnect();
                 freedomPlayer.Remove(playerSocketB);
 
                 CreateRoom(playerSocketA, playerSocketB);//创建房间
+            }
+        }
+
+        /// <summary>
+        /// 获取可用的TCP连接
+        /// </summary>
+        private PlayerSocket GetAvailableTCPConnect()
+        {
+            PlayerSocket checkSocket = freedomPlayer[0];
+            if (checkSocket.socket.Connected)
+            {
+                return checkSocket;
+            }
+            else
+            {
+                freedomPlayer.Remove(checkSocket);
+                return GetAvailableTCPConnect();
+            }
+        }
+
+        /// <summary>
+        /// 去除所有不可用的连接
+        /// </summary>
+        private void CheckFreePlayerList()
+        {
+            List<PlayerSocket> unavailableSocketList = new List<PlayerSocket>();
+
+            //检查列表
+            foreach (PlayerSocket playerSocket in freedomPlayer)
+            {
+                if (!playerSocket.socket.Connected)
+                {
+                    unavailableSocketList.Add(playerSocket);
+                }
+            }
+
+            //删除所有不可用连接
+            if (unavailableSocketList.Count > 0)
+            {
+                foreach (PlayerSocket unavailableSocket in unavailableSocketList)
+                {
+                    freedomPlayer.Remove(unavailableSocket);
+                }
+
+                LogsSystem.Instance.Print("已清空失效的连接" + unavailableSocketList.Count + "个");
             }
         }
 
