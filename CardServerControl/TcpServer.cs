@@ -24,6 +24,7 @@ namespace CardServerControl
             }
         }
         #endregion
+
         //编码格式
         public static Encoding encoding = Encoding.UTF8;
         private GameRoomManager grm;

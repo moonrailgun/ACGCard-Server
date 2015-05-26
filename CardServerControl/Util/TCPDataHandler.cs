@@ -35,6 +35,11 @@ namespace CardServerControl.Util
                             return TCPDataSender.Offline();
                         }
                     }
+                case OperateCode.HeartBeat:
+                    {
+                        HeartBeatSystem.Instance.ProcessHeartBeatPackage(socket);
+                        return null;
+                    }
                 case OperateCode.Offline:
                     {
                         return ProcessCancelMatching(JsonCoding<DisconnectDTO>.decode(data.operateData), socket);

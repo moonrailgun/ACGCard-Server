@@ -79,6 +79,7 @@
     </ApplicationDefinition>
     <Compile Include="CardManager.cs" />
     <Compile Include="GameRoomManager.cs" />
+    <Compile Include="HeartBeatSystem.cs" />
     <Compile Include="Model\AreaCode.cs" />
     <Compile Include="Model\Cards\Card.cs" />
     <Compile Include="Model\Cards\CharacterCard.cs" />
