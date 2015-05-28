@@ -108,6 +108,7 @@
     <Compile Include="Model\Skills\ContinuedSkill\StateSkill.cs" />
     <Compile Include="Model\Skills\InstantSkill\AttackSkill.cs" />
     <Compile Include="Model\Skills\Skill.cs" />
+    <Compile Include="Model\Skills\SkillManager.cs" />
     <Compile Include="Model\SocketModel.cs" />
     <Compile Include="Model\SocketProtocol.cs" />
     <Compile Include="MySQLHelper.cs" />

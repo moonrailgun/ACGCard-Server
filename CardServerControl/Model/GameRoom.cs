@@ -54,6 +54,46 @@ namespace CardServerControl.Model
         }
 
         /// <summary>
+        /// 根据位置标识获取对应位置的玩家数据信息
+        /// </summary>
+        public GamePlayerData GetPlayerDataByPositionSign(int position)
+        {
+            if (position == (int)PlayerPosition.A)
+            {
+                return this.playerDataA;
+            }
+            else if (position == (int)PlayerPosition.B)
+            {
+                return this.playerDataB;
+            }
+            else
+            {
+                LogsSystem.Instance.Print("未知的位置标示，无法获取玩家数据信息", LogLevel.WARN);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 根据卡片UUID获取场上的卡片
+        /// </summary>
+        public PlayerCard GetPlayerCard(string cardUUID)
+        {
+            if (playerDataA.characterCard.ContainsKey(cardUUID))
+            {
+                return playerDataA.characterCard[cardUUID];
+            }
+            else if (playerDataB.characterCard.ContainsKey(cardUUID))
+            {
+                return playerDataB.characterCard[cardUUID];
+            }
+            else
+            {
+                LogsSystem.Instance.Print("场上找不要这张卡:" + cardUUID, LogLevel.WARN);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 游戏中玩家的信息
         /// </summary>
         public class GamePlayerData

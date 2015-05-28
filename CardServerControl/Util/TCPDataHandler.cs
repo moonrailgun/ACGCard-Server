@@ -6,6 +6,7 @@ using System.Data;
 using System.Net.Sockets;
 using System.Net;
 using CardServerControl.Model.Cards;
+using CardServerControl.Model.Skills;
 
 namespace CardServerControl.Util
 {
@@ -21,6 +22,7 @@ namespace CardServerControl.Util
         {
             int operateCode = data.operateCode;
             string operateData = data.operateData;
+            //分发操作
             switch (operateCode)
             {
                 case OperateCode.Identify:
@@ -51,6 +53,10 @@ namespace CardServerControl.Util
                 case OperateCode.Attack:
                     {
                         return ProcessCommonAttack(data, socket);
+                    }
+                case OperateCode.UseSkill:
+                    {
+                        return ProcessUseSkill(data, socket);
                     }
                 case OperateCode.PlayerOwnCard:
                     {
@@ -226,6 +232,24 @@ namespace CardServerControl.Util
             detailData.damage = damage;
 
             data.operateData = JsonCoding<AttackData>.encode(detailData);//将修改过的数据压回去
+            room.SendOperateToAllPlayer(data);
+            return null;
+        }
+
+        /// <summary>
+        /// 处理卡片使用技能的信息包
+        /// </summary>
+        private GameData ProcessUseSkill(GameData data, Socket socket)
+        {
+            UseSkillData detail = JsonCoding<UseSkillData>.decode(data.operateData);
+            GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(data.roomID);
+
+            PlayerCard  from = room.GetPlayerCard(detail.fromCardUUID);
+            PlayerCard to = room.GetPlayerCard(detail.toCardUUID);
+            Skill skill = from.GetSkillById(detail.skillID);
+
+            skill.OnUse(from, to);//调用技能
+
             room.SendOperateToAllPlayer(data);
             return null;
         }

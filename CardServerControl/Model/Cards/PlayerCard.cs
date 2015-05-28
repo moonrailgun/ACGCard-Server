@@ -45,6 +45,9 @@ namespace CardServerControl.Model.Cards
             int value = this.baseSpeed + this.growSpeed * this.cardLevel + this.specialSpeed;
             return value;
         }
+
+        public List<Skill> GetCardOwnSkill()
+        { return this.cardOwnSkill; }
         #endregion
 
         public void SetPlayerCardInfo(int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
@@ -83,9 +86,12 @@ namespace CardServerControl.Model.Cards
         public void GetDamage(int damageValue)
         {
             this.currentHealth -= damageValue;
-            LogsSystem.Instance.Print(string.Format("角色{0}受到了{1}点伤害",this.cardName, damageValue));
+            LogsSystem.Instance.Print(string.Format("角色{0}受到了{1}点伤害", this.cardName, damageValue));
         }
 
+        /// <summary>
+        /// 附加状态
+        /// </summary>
         public void AppendState(StateSkill state)
         {
             this.PlayerCardState.Add(state);
@@ -93,9 +99,27 @@ namespace CardServerControl.Model.Cards
         }
 
         /// <summary>
-        /// 根据卡片ID获取卡片数据
+        /// 根据技能ID获取角色技能
         /// </summary>
-        public static PlayerCard GetPlayerCardDataByID(int cardID)
+        public Skill GetSkillById(int skillID)
+        {
+            foreach (Skill skill in cardOwnSkill)
+            {
+                if (skill.skillID == skillID)
+                {
+                    return skill;
+                }
+            }
+
+            LogsSystem.Instance.Print("该角色没有这个技能" + skillID, LogLevel.WARN);
+            return null;
+        }
+
+
+        /// <summary>
+        /// 根据卡片ID创建卡片数据
+        /// </summary>        
+        private static PlayerCard CreatePlayerCardByID(int cardID)
         {
             CharacterCard character = CardManager.Instance.GetCardCloneByID(cardID);
             PlayerCard playerCard = new PlayerCard();
@@ -114,13 +138,10 @@ namespace CardServerControl.Model.Cards
 
             return playerCard;
         }
-        /// <summary>
-        /// 根据卡片ID获取卡片数据
-        /// </summary>
-        public static PlayerCard GetPlayerCardDataByID(int cardID, int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
+        public static PlayerCard CreatePlayerCardByID(int cardID, int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
         {
-            PlayerCard playerCard = GetPlayerCardDataByID(cardID);
-            playerCard.SetPlayerCardInfo(cardOwnerId,  cardLevel,  specialHealth,  specialEnergy,  specialAttack,  specialSpeed);
+            PlayerCard playerCard = CreatePlayerCardByID(cardID);
+            playerCard.SetPlayerCardInfo(cardOwnerId, cardLevel, specialHealth, specialEnergy, specialAttack, specialSpeed);
 
             return playerCard;
         }

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using CardServerControl.Util;
 using CardServerControl.Model.DTO.GameData;
+using CardServerControl.Model.Skills;
 
 namespace CardServerControl
 {
@@ -28,6 +29,7 @@ namespace CardServerControl
         //编码格式
         public static Encoding encoding = Encoding.UTF8;
         private GameRoomManager grm;
+        private SkillManager skillManager;
         private TCPDataHandler tcpDH;
         private TCPDataSender tcpSD;
         public const int gamePort = 28283;
@@ -42,6 +44,7 @@ namespace CardServerControl
             {
                 LogsSystem.Instance.Print("正在初始化TCP服务");
                 grm = new GameRoomManager();
+                skillManager = new SkillManager();
                 tcpDH = new TCPDataHandler();
                 tcpSD = new TCPDataSender();
                 listener = new TcpListener(IPAddress.Parse("127.0.0.1"), gamePort);
@@ -116,9 +119,13 @@ namespace CardServerControl
         /// 获取tcp数据发送器
         /// </summary>
         public TCPDataSender GetTCPDataSender()
-        {
-            return this.tcpSD;
-        }
+        { return this.tcpSD; }
+
+        /// <summary>
+        /// 获取技能管理器
+        /// </summary>
+        public SkillManager GetSkillManager()
+        { return this.skillManager; }
 
         #region 发送数据
         public void Send(Socket socket, GameData data)
