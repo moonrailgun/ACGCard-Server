@@ -11,6 +11,7 @@ namespace CardServerControl
 {
     /// <summary>
     /// 卡片基础通用信息管理类
+    /// 数据来源于数据库
     /// </summary>
     class CardManager
     {

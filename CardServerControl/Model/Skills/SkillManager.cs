@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CardServerControl.Model.Skills.InstantSkill;
 
 namespace CardServerControl.Model.Skills
 {
     /// <summary>
     /// 技能管理类
+    /// 后期添加反射机制用于扩展，前期直接写死
     /// </summary>
     class SkillManager
     {
@@ -23,11 +22,24 @@ namespace CardServerControl.Model.Skills
         /// </summary>
         private void Register()
         {
+            //伤害数据为测试用，并非最终数据
+            AddSkill(new AttackSkill(1, "ArcaneMissiles", 60));
+            AddSkill(new AttackSkill(2, "Fireball", 50));
+            AddSkill(new AttackSkill(3, "FireArrow", 70));
+            AddSkill(new AttackSkill(4, "Meteorites", 70));
+            AddSkill(new AttackSkill(5, "Thunderbolt", 90));
+            AddSkill(new AttackSkill(6, "MeteoriteCut", 80));
 
+            LogsSystem.Instance.Print("技能数据加载完毕,共有 "+skillList.Count+" 个技能");
+        }
+
+        private void AddSkill(Skill skill)
+        {
+            this.skillList.Add(skill);
         }
 
         /// <summary>
-        /// 根据技能ID查找技能
+        /// 根据技能ID获取技能的克隆
         /// </summary>
         public Skill GetSkillById(int skillID)
         {
@@ -35,7 +47,7 @@ namespace CardServerControl.Model.Skills
             {
                 if (skill.skillID == skillID)
                 {
-                    return skill;
+                    return skill.Clone() as Skill;
                 }
             }
 

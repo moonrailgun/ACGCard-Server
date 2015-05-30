@@ -1,13 +1,21 @@
 ﻿using CardServerControl.Model.Cards;
 using CardServerControl.Model.Skills.ContinuedSkill;
 using System.Collections.Generic;
+using LitJson;
 
 namespace CardServerControl.Model.Skills.InstantSkill
 {
-    abstract class AttackSkill : Skill
+    class AttackSkill : Skill
     {
-        protected int skillDamageValue = 0;
-        protected List<StateSkill> appendStateList = new List<StateSkill>();
+        protected int skillDamageValue = 0;//技能伤害
+        protected List<StateSkill> appendStateList;
+
+        public AttackSkill(int skillID, string skillName, int skillDamageValue, List<StateSkill> appendStateList = null)
+            :base(skillID, skillName)
+        {
+            this.skillDamageValue = skillDamageValue;
+            this.appendStateList = appendStateList;
+        }
 
         public void SetBasicDamage(int value)
         {
@@ -48,6 +56,14 @@ namespace CardServerControl.Model.Skills.InstantSkill
                     target.AppendState(state);
                 }
             }
+        }
+
+        public override string GetSkillAppendData()
+        {
+            JsonData data = new JsonData();
+            data["damage"] = GetCalculatedDamage();
+
+            return data.ToJson();
         }
     }
 }

@@ -4,6 +4,7 @@ using CardServerControl.Model.DTO.GameData;
 using System.Data;
 using System.Collections.Generic;
 using System;
+using CardServerControl.Model.Skills;
 
 namespace CardServerControl.Util
 {
@@ -46,6 +47,15 @@ namespace CardServerControl.Util
                         playerCard.specialAttack = Convert.ToInt32(row["SpecialAttack"]);
                         playerCard.specialSpeed = Convert.ToInt32(row["SpecialSpeed"]);
 
+                        //设置卡片拥有技能
+                        int[] skillIdArray = IntArray.StringToIntArray(row["CardOwnSkill"].ToString());//获取卡片技能的ID列表
+                        SkillManager skillManager = TcpServer.Instance.GetSkillManager();
+                        foreach (int skillId in skillIdArray)
+                        {
+                            Skill skill = skillManager.GetSkillById(skillId);//从技能管理器中获取该技能的克隆
+                            playerCard.AddSkill(skill);
+                        }
+
                         CardInfo cardInfo = playerCard.GetCardInfo();
                         requestData.cardInv.Add(cardInfo);//添加到列表
                         playerCardList.Add(playerCard);//添加卡片
@@ -59,7 +69,7 @@ namespace CardServerControl.Util
                 //将数据加载到本地内存
                 room.SetCardInv(playerCardList, position);
 
-                //封装
+                //封装返回数据
                 GameData returnData = new GameData();
                 returnData.operateCode = OperateCode.PlayerOwnCard;
                 returnData.roomID = -1;
@@ -73,7 +83,6 @@ namespace CardServerControl.Util
                 return Offline();
             }
         }
-
 
         /// <summary>
         /// 检查UUID是否合法

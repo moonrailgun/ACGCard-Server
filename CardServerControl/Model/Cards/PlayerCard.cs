@@ -2,6 +2,7 @@
 using CardServerControl.Model.Skills;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CardServerControl.Util;
 
 namespace CardServerControl.Model.Cards
 {
@@ -50,6 +51,28 @@ namespace CardServerControl.Model.Cards
         { return this.cardOwnSkill; }
         #endregion
 
+        #region 属性设置
+        public void AddSkill(Skill addedSkill)
+        {
+            int skillID = addedSkill.skillID;
+            //检查重复性
+            foreach (Skill skill in cardOwnSkill)
+            {
+                if (skill.skillID == skillID)
+                {
+                    LogsSystem.Instance.Print("添加失败，该玩家已经有了同样ID的技能" + skillID, LogLevel.WARN);
+                    return;
+                }
+            }
+
+            this.cardOwnSkill.Add(addedSkill);
+        }
+        public void SetCardOwnSkill(List<Skill> skillList)
+        {
+            this.cardOwnSkill = skillList;
+        }
+        #endregion
+
         public void SetPlayerCardInfo(int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
         {
             this.cardOwnerId = cardOwnerId;
@@ -72,6 +95,7 @@ namespace CardServerControl.Model.Cards
             info.cardOwnerId = this.cardOwnerId;
             info.cardRarity = this.cardRarity;
             info.cardLevel = this.cardLevel;
+            info.cardOwnSkill = IntArray.IntArrayToString(GetSkillIdArray());
             info.health = this.GetHealth();
             info.energy = this.GetSpeed();
             info.attack = this.GetAttack();
@@ -113,6 +137,21 @@ namespace CardServerControl.Model.Cards
 
             LogsSystem.Instance.Print("该角色没有这个技能" + skillID, LogLevel.WARN);
             return null;
+        }
+
+        /// <summary>
+        /// 获取卡片拥有的技能ID列表
+        /// 用于传递数据
+        /// </summary>
+        public int[] GetSkillIdArray()
+        {
+            List<int> skillIdList = new List<int>();
+            foreach (Skill skill in cardOwnSkill)
+            {
+                skillIdList.Add(skill.skillID);
+            }
+
+            return skillIdList.ToArray();
         }
 
 

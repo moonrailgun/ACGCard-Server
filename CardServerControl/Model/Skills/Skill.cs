@@ -1,8 +1,9 @@
 ﻿using CardServerControl.Model.Cards;
+using System;
 
 namespace CardServerControl.Model.Skills
 {
-    abstract class Skill
+    abstract class Skill : ICloneable
     {
         public Skill(int skillID, string skillName)
         {
@@ -14,5 +15,15 @@ namespace CardServerControl.Model.Skills
         public string skillName = "";
 
         public abstract void OnUse(PlayerCard from, PlayerCard target);
+
+        /// <summary>
+        /// 获取技能附加数据
+        /// </summary>
+        public abstract string GetSkillAppendData();
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }
