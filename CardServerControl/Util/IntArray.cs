@@ -19,7 +19,15 @@ namespace CardServerControl.Util
 
         public static int[] StringToIntArray(string json)
         {
-            int[] array = JsonMapper.ToObject<int[]>(json);
+            int[] array;
+            if (json != "[]" && string.IsNullOrEmpty(json))
+            {
+                array = JsonMapper.ToObject<int[]>(json);
+            }
+            else
+            {
+                array = new int[0];//返回一个空数组
+            }
 
             return array;
         }

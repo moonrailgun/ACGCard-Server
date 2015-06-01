@@ -77,9 +77,9 @@ namespace CardServerControl
 
         public int GetRarityByCardId(int cardId)
         {
-            CharacterCard character = characterCardMap[cardId];
-            if (character != null)
+            if (characterCardMap.ContainsKey(cardId))
             {
+                CharacterCard character = characterCardMap[cardId];
                 return character.cardRarity;
             }
             else
@@ -90,9 +90,9 @@ namespace CardServerControl
 
         public string GetNameById(int cardId)
         {
-            CharacterCard character = characterCardMap[cardId];
-            if (character != null)
+            if (characterCardMap.ContainsKey(cardId))
             {
+                CharacterCard character = characterCardMap[cardId];
                 return character.cardName;
             }
             else

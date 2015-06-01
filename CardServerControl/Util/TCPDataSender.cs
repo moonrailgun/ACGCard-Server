@@ -37,15 +37,33 @@ namespace CardServerControl.Util
                 {
                     try
                     {
+                        int cardID = Convert.ToInt32(row["CardId"]);
+
+                        CharacterCard standardCharacterCard = cardManager.GetCardCloneByID(cardID);
+
                         PlayerCard playerCard = new PlayerCard();
+                        //卡片通用
                         playerCard.cardUUID = System.Guid.NewGuid().ToString();//创建卡片的UUID作为唯一标识
-                        playerCard.cardId = Convert.ToInt32(row["CardId"]);
+                        playerCard.cardId = cardID;
+                        playerCard.cardName = standardCharacterCard.cardName;
+                        playerCard.cardRarity = standardCharacterCard.cardRarity;
+                        //角色卡通用
+                        playerCard.baseHealth = standardCharacterCard.baseHealth;
+                        playerCard.baseEnergy = standardCharacterCard.baseEnergy;
+                        playerCard.baseAttack = standardCharacterCard.baseAttack;
+                        playerCard.baseSpeed = standardCharacterCard.baseSpeed;
+                        playerCard.growHealth = standardCharacterCard.growHealth;
+                        playerCard.growEnergy = standardCharacterCard.growEnergy;
+                        playerCard.growAttack = standardCharacterCard.growAttack;
+                        playerCard.growSpeed = standardCharacterCard.growSpeed;
+                        //游戏卡个性化
                         playerCard.cardOwnerId = Convert.ToInt32(row["CardOwnerId"]);
                         playerCard.cardLevel = Convert.ToInt32(row["CardLevel"]);
                         playerCard.specialHealth = Convert.ToInt32(row["SpecialHealth"]);
                         playerCard.specialEnergy = Convert.ToInt32(row["SpecialEnergy"]);
                         playerCard.specialAttack = Convert.ToInt32(row["SpecialAttack"]);
                         playerCard.specialSpeed = Convert.ToInt32(row["SpecialSpeed"]);
+                        playerCard.InitHealthAndEnergy();
 
                         //设置卡片拥有技能
                         int[] skillIdArray = IntArray.StringToIntArray(row["CardOwnSkill"].ToString());//获取卡片技能的ID列表
@@ -72,7 +90,7 @@ namespace CardServerControl.Util
                 //封装返回数据
                 GameData returnData = new GameData();
                 returnData.operateCode = OperateCode.PlayerOwnCard;
-                returnData.roomID = -1;
+                returnData.roomID = room.roomID;
                 returnData.returnCode = ReturnCode.Success;
                 returnData.operateData = JsonCoding<GamePlayerOwnCardData>.encode(requestData);
 

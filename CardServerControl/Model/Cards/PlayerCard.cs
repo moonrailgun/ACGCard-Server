@@ -86,6 +86,15 @@ namespace CardServerControl.Model.Cards
             this.maxEnergy = this.currentEnergy = this.GetEnergy();
         }
 
+        /// <summary>
+        /// 将血量和能量初始化为最开始值
+        /// </summary>
+        public void InitHealthAndEnergy()
+        {
+            this.maxHealth = this.currentHealth = this.GetHealth();
+            this.maxEnergy = this.currentEnergy = this.GetEnergy();
+        }
+
         public CardInfo GetCardInfo()
         {
             CardInfo info = new CardInfo();

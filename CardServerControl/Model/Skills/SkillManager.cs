@@ -10,7 +10,7 @@ namespace CardServerControl.Model.Skills
     /// </summary>
     class SkillManager
     {
-        List<Skill> skillList;
+        List<Skill> skillList = new List<Skill>();
 
         public SkillManager()
         {

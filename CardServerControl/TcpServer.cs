@@ -136,7 +136,7 @@ namespace CardServerControl
         }
         public void Send(Socket socket, byte[] data)
         {
-            LogsSystem.Instance.Print(string.Format("发送数据({0}):{1}", data.Length, encoding.GetString(data)));
+            LogsSystem.Instance.Print(string.Format("TCP 发送数据({0}):{1}", data.Length, encoding.GetString(data)));
             if (socket.Connected && socket != null)
             {
                 socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), socket);
@@ -149,7 +149,7 @@ namespace CardServerControl
                 Socket handler = (Socket)ar.AsyncState;
 
                 int bytesSent = handler.EndSend(ar);
-                LogsSystem.Instance.Print(string.Format("数据({0})发送完成", bytesSent));
+                LogsSystem.Instance.Print(string.Format("TCP 数据({0})发送完成", bytesSent));
             }
             catch (Exception e)
             {
@@ -228,7 +228,7 @@ namespace CardServerControl
             {
                 //获取收到的数据
                 string message = encoding.GetString(messageBytes);
-                LogsSystem.Instance.Print(string.Format("[FROM {0}]:{1}", socket.RemoteEndPoint, message));
+                LogsSystem.Instance.Print(string.Format("[TCP FROM {0}]:{1}", socket.RemoteEndPoint, message));
 
                 //转换数据
                 GameData data = JsonCoding<GameData>.decode(message);

@@ -116,6 +116,7 @@
     <Compile Include="PlayerManager.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="UdpServer.cs" />
+    <Compile Include="Util\IntArray.cs" />
     <Compile Include="Util\JsonCoding.cs" />
     <Compile Include="Util\PacketProcess.cs" />
     <Compile Include="Util\TCPDataHandler.cs" />

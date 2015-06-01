@@ -8,6 +8,10 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
 {
     abstract class StateSkill : Skill
     {
+        protected StateSkill(int skillID, string skillName)
+            :base(skillID, skillName)
+        {}
+
         protected abstract void OnCharacterAttack();
         protected abstract void OnRoundStart();
         protected abstract void OnRoundEnd();
