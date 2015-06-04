@@ -249,8 +249,10 @@ namespace CardServerControl.Util
             Skill skill = from.GetSkillById(detail.skillID);
 
             skill.OnUse(from, to);//调用技能
+            detail.skillAppendData = skill.GenerateSkillAppendData(from, to);
 
-            room.SendOperateToAllPlayer(data);
+            data.operateData = JsonCoding<UseSkillData>.encode(detail);//重新打包
+            room.SendOperateToAllPlayer(data);//发送全局
             return null;
         }
 

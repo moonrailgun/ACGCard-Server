@@ -58,7 +58,7 @@ namespace CardServerControl.Model.Skills.InstantSkill
             }
         }
 
-        public override string GetSkillAppendData()
+        public override string GenerateSkillAppendData(PlayerCard from, PlayerCard to)
         {
             JsonData data = new JsonData();
             data["damage"] = GetCalculatedDamage();
