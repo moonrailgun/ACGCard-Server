@@ -78,13 +78,13 @@ namespace CardServerControl.Model
         /// </summary>
         public PlayerCard GetPlayerCard(string cardUUID)
         {
-            if (playerDataA.characterCard.ContainsKey(cardUUID))
+            if (playerDataA.isHavePlayerCard(cardUUID))
             {
-                return playerDataA.characterCard[cardUUID];
+                return playerDataA.GetPlayerCardByCardUUID(cardUUID);
             }
-            else if (playerDataB.characterCard.ContainsKey(cardUUID))
+            else if (playerDataB.isHavePlayerCard(cardUUID))
             {
-                return playerDataB.characterCard[cardUUID];
+                return playerDataB.GetPlayerCardByCardUUID(cardUUID);
             }
             else
             {
@@ -130,11 +130,48 @@ namespace CardServerControl.Model
             }
 
             /// <summary>
+            /// 检查是否存在这张卡
+            /// </summary>
+            public bool isHavePlayerCard(string cardUUID)
+            {
+                if (characterCard.ContainsKey(cardUUID))
+                {
+                    if (characterCard[cardUUID].isAlive)
+                    { return true; }
+                    else
+                    {
+                        LogsSystem.Instance.Print("卡片已死亡，立即从队列中删除" + cardUUID, LogLevel.WARN);
+                        characterCard.Remove(cardUUID);
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            /// <summary>
             /// 根据UUID返回角色卡片
             /// </summary>
-            public PlayerCard GetPlayerCardByCardUUID(string CardUUID)
+            public PlayerCard GetPlayerCardByCardUUID(string cardUUID)
             {
-                return characterCard[CardUUID];
+                if (characterCard.ContainsKey(cardUUID))
+                {
+                    if (characterCard[cardUUID].isAlive)
+                    { return characterCard[cardUUID]; }
+                    else
+                    {
+                        LogsSystem.Instance.Print("卡片已死亡，立即从队列中删除" + cardUUID, LogLevel.ERROR);
+                        characterCard.Remove(cardUUID);
+                        return null;
+                    }
+                }
+                else
+                {
+                    LogsSystem.Instance.Print("不存在这张卡:" + cardUUID, LogLevel.ERROR);
+                    return null;
+                }
             }
         }
 

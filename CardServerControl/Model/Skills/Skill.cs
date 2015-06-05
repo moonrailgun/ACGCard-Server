@@ -5,6 +5,8 @@ namespace CardServerControl.Model.Skills
 {
     abstract class Skill : ICloneable
     {
+        public int skillEnergyCost = 0;//技能能量消耗
+
         public Skill(int skillID, string skillName)
         {
             this.skillID = skillID;

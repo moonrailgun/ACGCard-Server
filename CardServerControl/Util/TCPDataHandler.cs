@@ -248,8 +248,17 @@ namespace CardServerControl.Util
             PlayerCard to = room.GetPlayerCard(detail.toCardUUID);
             Skill skill = from.GetSkillById(detail.skillID);
 
-            skill.OnUse(from, to);//调用技能
-            detail.skillAppendData = skill.GenerateSkillAppendData(from, to);
+            if (from.currentEnergy >= skill.skillEnergyCost)
+            {
+                //拥有足够能量
+                skill.OnUse(from, to);//调用技能
+                detail.skillAppendData = skill.GenerateSkillAppendData(from, to);
+            }
+            else
+            {
+                //没有足够能量
+                data.returnCode = ReturnCode.Failed;
+            }
 
             data.operateData = JsonCoding<UseSkillData>.encode(detail);//重新打包
             room.SendOperateToAllPlayer(data);//发送全局

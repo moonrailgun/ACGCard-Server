@@ -11,6 +11,8 @@ namespace CardServerControl.Model.Cards
     /// </summary>
     class PlayerCard : CharacterCard
     {
+        public bool isAlive = true;
+
         public int cardOwnerId;
         public int cardLevel;
         public int specialHealth;
@@ -120,6 +122,19 @@ namespace CardServerControl.Model.Cards
         {
             this.currentHealth -= damageValue;
             LogsSystem.Instance.Print(string.Format("角色{0}受到了{1}点伤害", this.cardName, damageValue));
+
+            if (this.currentHealth <= 0)
+            {
+                OnDead();
+            }
+        }
+
+        /// <summary>
+        /// 角色死亡
+        /// </summary>
+        private void OnDead()
+        {
+            this.isAlive = false;
         }
 
         /// <summary>

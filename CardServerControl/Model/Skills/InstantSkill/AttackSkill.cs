@@ -8,12 +8,13 @@ namespace CardServerControl.Model.Skills.InstantSkill
     class AttackSkill : Skill
     {
         protected int skillDamageValue = 0;//技能伤害
-        protected List<StateSkill> appendStateList;
+        protected List<StateSkill> appendStateList;//攻击技能附加的状态
 
-        public AttackSkill(int skillID, string skillName, int skillDamageValue, List<StateSkill> appendStateList = null)
+        public AttackSkill(int skillID, string skillName, int skillDamageValue,int skillEnergyCost, List<StateSkill> appendStateList = null)
             :base(skillID, skillName)
         {
             this.skillDamageValue = skillDamageValue;
+            this.skillEnergyCost = skillEnergyCost;
             this.appendStateList = appendStateList;
         }
 
@@ -44,8 +45,10 @@ namespace CardServerControl.Model.Skills.InstantSkill
         {
             int skillDamage = this.GetCalculatedDamage();
 
-            //造成伤害
-            target.GetDamage(skillDamage);
+            
+            target.GetDamage(skillDamage);//造成伤害
+            from.currentEnergy -= this.skillEnergyCost;//消耗能量
+
             LogsSystem.Instance.Print(string.Format("{0}对{1}释放了技能{2}，造成伤害{3}点。", from.cardName, target.cardName, this.skillName, skillDamage), LogLevel.GAMEDETAIL);
 
             //附加状态
@@ -62,6 +65,7 @@ namespace CardServerControl.Model.Skills.InstantSkill
         {
             JsonData data = new JsonData();
             data["damage"] = GetCalculatedDamage();
+            data["energy"] = this.skillEnergyCost;
 
             return data.ToJson();
         }
