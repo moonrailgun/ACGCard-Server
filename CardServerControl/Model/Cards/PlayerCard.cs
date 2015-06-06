@@ -3,6 +3,7 @@ using CardServerControl.Model.Skills;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CardServerControl.Util;
+using CardServerControl.Model.DTO.GameData;
 
 namespace CardServerControl.Model.Cards
 {
@@ -24,8 +25,10 @@ namespace CardServerControl.Model.Cards
         public int maxHealth;
         public int maxEnergy;
 
+        protected GameRoom cardRoom;
+        protected int cardOwnerPostion = -1;
         protected List<Skill> cardOwnSkill = new List<Skill>();
-        protected List<StateSkill> PlayerCardState = new List<StateSkill>();
+        protected List<StateSkill> PlayerCardState = new List<StateSkill>();//卡品上附加的数据
 
         #region 属性获取
         public int GetHealth()
@@ -72,6 +75,39 @@ namespace CardServerControl.Model.Cards
         public void SetCardOwnSkill(List<Skill> skillList)
         {
             this.cardOwnSkill = skillList;
+        }
+        public void SetOwnerData(GameRoom cardRoom, int position)
+        {
+            this.cardRoom = cardRoom;
+            this.cardOwnerPostion = position;
+        }
+        #endregion
+
+        #region 技能状态操作
+        public void AddState(StateSkill skill)
+        {
+            this.PlayerCardState.Add(skill);
+
+            //向服务器请求添加状态
+            TcpServer.Instance.GetTCPDataSender().SendStateOperate(this, OperateStateData.StateOperateCode.AddState, cardOwnerPostion, cardRoom);
+        }
+
+        /// <summary>
+        /// 移除状态
+        /// </summary>
+        public void RemoveState(StateSkill skill)
+        {
+            if (PlayerCardState.Contains(skill))
+            {
+                this.PlayerCardState.Remove(skill);
+
+                //向服务器请求去除状态
+                TcpServer.Instance.GetTCPDataSender().SendStateOperate(this, OperateStateData.StateOperateCode.RemoveState, cardOwnerPostion, cardRoom);
+            }
+            else
+            {
+                LogsSystem.Instance.Print("卡片上不具备该技能：" + skill.skillName, LogLevel.WARN);
+            }
         }
         #endregion
 

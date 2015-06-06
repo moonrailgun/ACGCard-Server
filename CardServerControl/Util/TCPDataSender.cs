@@ -103,6 +103,16 @@ namespace CardServerControl.Util
         }
 
         /// <summary>
+        /// 向
+        /// </summary>
+        /// <param name="operateCard"></param>
+        /// <param name="operateType"></param>
+        public void SendStateOperate(PlayerCard operateCard, int operateType, int operatePosition , GameRoom gameRoom)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
         /// 检查UUID是否合法
         /// </summary>
         public static bool CheckUUID(string uuid)

@@ -23,8 +23,8 @@ namespace CardServerControl.Model
             this.playerSocketA = playerSocketA;
             this.playerSocketB = playerSocketB;
 
-            this.playerDataA = new GamePlayerData();
-            this.playerDataB = new GamePlayerData();
+            this.playerDataA = new GamePlayerData(this, PlayerPosition.A);
+            this.playerDataB = new GamePlayerData(this, PlayerPosition.B);
         }
 
         /// <summary>
@@ -101,20 +101,28 @@ namespace CardServerControl.Model
             public Dictionary<string, PlayerCard> characterCard;//场上卡片<卡片UUID,卡片对象>
             public List<CardInfo> handCard;//手牌
             public List<PlayerCard> characterCardInv;//角色卡片背包
+            public GameRoom gameRoom;//当前信息的上级房间信息索引
+            public PlayerPosition position;//信息所在位置
 
             /// <summary>
             /// 初始化
             /// </summary>
-            public GamePlayerData()
+            public GamePlayerData(GameRoom room, PlayerPosition position)
             {
                 this.characterCard = new Dictionary<string, PlayerCard>();
                 this.handCard = new List<CardInfo>();
                 this.characterCardInv = new List<PlayerCard>();
+                this.gameRoom = room;
+                this.position = position;
             }
 
+            /// <summary>
+            /// 添加卡片到房间
+            /// </summary>
             public void AddPlayerCard(PlayerCard card)
             {
                 characterCard.Add(card.cardUUID, card);
+                card.SetOwnerData(this.gameRoom, (int)this.position);
             }
 
             public bool IsOwnCard(string UUID)
