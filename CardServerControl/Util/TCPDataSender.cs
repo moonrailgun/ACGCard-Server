@@ -5,6 +5,7 @@ using System.Data;
 using System.Collections.Generic;
 using System;
 using CardServerControl.Model.Skills;
+using CardServerControl.Model.Skills.ContinuedSkill;
 
 namespace CardServerControl.Util
 {
@@ -17,7 +18,7 @@ namespace CardServerControl.Util
         /// 根据玩家的UUID和UID
         /// 发送玩家拥有的卡片(仅在此时创建卡片的UUID)
         /// </summary>
-        public GameData SendPlayerOwnCard(GamePlayerOwnCardData requestData,GameRoom room)
+        public GameData SendPlayerOwnCard(GamePlayerOwnCardData requestData, GameRoom room)
         {
             int uid = requestData.operatePlayerUid;
             string UUID = requestData.operatePlayerUUID;
@@ -103,13 +104,43 @@ namespace CardServerControl.Util
         }
 
         /// <summary>
-        /// 向
+        /// 向客户端发送状态修改操作的请求
         /// </summary>
-        /// <param name="operateCard"></param>
-        /// <param name="operateType"></param>
-        public void SendStateOperate(PlayerCard operateCard, int operateType, int operatePosition , GameRoom gameRoom)
+        public void SendStateOperate(StateSkill skill, PlayerCard operateCard, int operateType, int operatePosition, GameRoom gameRoom)
         {
-            throw new System.NotImplementedException();
+            OperateStateData detail = new OperateStateData();
+            detail.skillID = skill.skillID;
+            detail.stateOperate = operateType;
+            switch (operateCard.GetCardOwnerPosition())
+            {
+                case 0://A
+                    {
+                        detail.operatePlayerPosition = 0;
+                        detail.operatePlayerUid = gameRoom.playerSocketA.playerInfo.playerUid;
+                        detail.operatePlayerUUID = gameRoom.playerSocketA.playerInfo.playerUUID;
+                        break;
+                    }
+                case 1://B
+                    {
+                        detail.operatePlayerPosition = 1;
+                        detail.operatePlayerUid = gameRoom.playerSocketB.playerInfo.playerUid;
+                        detail.operatePlayerUUID = gameRoom.playerSocketB.playerInfo.playerUUID;
+                        break;
+                    }
+                default:
+                    {
+                        LogsSystem.Instance.Print("错误:卡片拥有者的位置出现错误:" + operateCard.GetCardOwnerPosition(), LogLevel.WARN);
+                        break;
+                    }
+            }
+
+            GameData data = new GameData();
+            data.returnCode = ReturnCode.Success;
+            data.roomID = gameRoom.roomID;
+            data.operateCode = OperateCode.OperateState;
+            data.operateData = JsonCoding<OperateStateData>.encode(detail);
+
+            gameRoom.SendOperateToAllPlayer(data);
         }
 
         /// <summary>

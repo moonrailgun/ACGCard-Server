@@ -54,6 +54,9 @@ namespace CardServerControl.Model.Cards
 
         public List<Skill> GetCardOwnSkill()
         { return this.cardOwnSkill; }
+
+        public int GetCardOwnerPosition()
+        { return this.cardOwnerPostion; }
         #endregion
 
         #region 属性设置
@@ -89,7 +92,7 @@ namespace CardServerControl.Model.Cards
             this.PlayerCardState.Add(skill);
 
             //向服务器请求添加状态
-            TcpServer.Instance.GetTCPDataSender().SendStateOperate(this, OperateStateData.StateOperateCode.AddState, cardOwnerPostion, cardRoom);
+            TcpServer.Instance.GetTCPDataSender().SendStateOperate(skill, this, OperateStateData.StateOperateCode.AddState, cardOwnerPostion, cardRoom);
         }
 
         /// <summary>
@@ -102,7 +105,7 @@ namespace CardServerControl.Model.Cards
                 this.PlayerCardState.Remove(skill);
 
                 //向服务器请求去除状态
-                TcpServer.Instance.GetTCPDataSender().SendStateOperate(this, OperateStateData.StateOperateCode.RemoveState, cardOwnerPostion, cardRoom);
+                TcpServer.Instance.GetTCPDataSender().SendStateOperate(skill, this, OperateStateData.StateOperateCode.RemoveState, cardOwnerPostion, cardRoom);
             }
             else
             {

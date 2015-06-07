@@ -14,5 +14,6 @@
         public const int UseSkill = 32;
         public const int PlayerOwnCard = 33;
         public const int SummonCharacter = 34;
+        public const int OperateState = 35;
     }
 }
