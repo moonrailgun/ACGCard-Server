@@ -103,8 +103,8 @@ namespace CardServerControl.Model.Cards
             this.playerCardState.Add(skill);
             LogsSystem.Instance.Print(string.Format("英雄 {0} 获得了状态 {1} ，持续 {2} 回合", this.cardName, skill.skillName, skill.GetRemainRounds()), LogLevel.GAMEDETAIL);
 
-            //向服务器请求添加状态
-            TcpServer.Instance.GetTCPDataSender().SendStateOperate(skill, this, OperateStateData.StateOperateCode.AddState, cardOwnerPostion, cardRoom);
+            //通过技能的USE操作添加
+            //TcpServer.Instance.GetTCPDataSender().SendStateOperate(skill, this, OperateStateData.StateOperateCode.AddState, cardOwnerPostion, cardRoom);
         }
 
         /// <summary>

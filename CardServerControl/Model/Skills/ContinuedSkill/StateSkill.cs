@@ -70,5 +70,10 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
         {
             this.stateOwnerCard.RemoveState(this);
         }
+
+        public override void OnUse(PlayerCard from, PlayerCard target)
+        {
+            target.AddState(this);
+        }
     }
 }
