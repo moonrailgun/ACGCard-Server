@@ -5,10 +5,10 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
 {
     class AttackUp : StateSkill
     {
-        protected int value;
+        protected int value;//攻击上升的值
 
         public AttackUp(int skillID, string skillName, int lastRound, int addValue)
-            :base(skillID, skillName, lastRound)
+            : base(skillID, skillName, lastRound)
         {
             this.value = addValue;
         }
@@ -20,7 +20,13 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
             target.AddState(this);
         }
 
-        public override string GenerateSkillAppendData(Cards.PlayerCard from, Cards.PlayerCard to)
+        /// <summary>
+        /// 获取增加的攻击力值
+        /// </summary>
+        public int GetAddedValue()
+        { return this.value; }
+
+        public override string GenerateSkillAppendData()
         {
             JsonData json = new JsonData();
             json["value"] = this.value;

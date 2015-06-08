@@ -252,7 +252,7 @@ namespace CardServerControl.Util
             {
                 //拥有足够能量
                 skill.OnUse(from, to);//调用技能
-                detail.skillAppendData = skill.GenerateSkillAppendData(from, to);
+                detail.skillAppendData = skill.GenerateSkillAppendData();
             }
             else
             {

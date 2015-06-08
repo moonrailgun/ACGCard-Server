@@ -4,6 +4,7 @@
     {
         public int skillID;
         public int stateOperate;
+        public string ownerCardUUID;
         public string appendData;
 
         public class StateOperateCode

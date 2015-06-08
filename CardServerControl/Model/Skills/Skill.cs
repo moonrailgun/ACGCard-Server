@@ -24,7 +24,7 @@ namespace CardServerControl.Model.Skills
         /// <summary>
         /// 生成技能附加数据
         /// </summary>
-        public abstract string GenerateSkillAppendData(PlayerCard from, PlayerCard to);
+        public abstract string GenerateSkillAppendData();
 
         public object Clone()
         {

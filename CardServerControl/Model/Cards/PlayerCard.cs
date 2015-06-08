@@ -28,7 +28,7 @@ namespace CardServerControl.Model.Cards
         protected GameRoom cardRoom;
         protected int cardOwnerPostion = -1;
         protected List<Skill> cardOwnSkill = new List<Skill>();
-        protected List<StateSkill> PlayerCardState = new List<StateSkill>();//卡品上附加的数据
+        protected List<StateSkill> playerCardState = new List<StateSkill>();//卡品上附加的数据
 
         #region 属性获取
         public int GetHealth()
@@ -44,6 +44,16 @@ namespace CardServerControl.Model.Cards
         public int GetAttack()
         {
             int value = this.baseAttack + this.growAttack * this.cardLevel + this.specialAttack;
+
+            foreach (StateSkill skill in playerCardState)
+            {
+                if (skill is AttackUp)
+                {
+                    AttackUp attackUpSkill = skill as AttackUp;
+                    value += attackUpSkill.GetAddedValue();
+                }
+            }
+
             return value;
         }
         public int GetSpeed()
@@ -89,7 +99,8 @@ namespace CardServerControl.Model.Cards
         #region 技能状态操作
         public void AddState(StateSkill skill)
         {
-            this.PlayerCardState.Add(skill);
+            skill.SetStateInfo(this);
+            this.playerCardState.Add(skill);
             LogsSystem.Instance.Print(string.Format("英雄 {0} 获得了状态 {1} ，持续 {2} 回合", this.cardName, skill.skillName, skill.GetRemainRounds()), LogLevel.GAMEDETAIL);
 
             //向服务器请求添加状态
@@ -101,9 +112,9 @@ namespace CardServerControl.Model.Cards
         /// </summary>
         public void RemoveState(StateSkill skill)
         {
-            if (PlayerCardState.Contains(skill))
+            if (playerCardState.Contains(skill))
             {
-                this.PlayerCardState.Remove(skill);
+                this.playerCardState.Remove(skill);
                 LogsSystem.Instance.Print(string.Format("英雄 {0} 移除了状态 {1}", this.cardName, skill.skillName), LogLevel.GAMEDETAIL);
 
                 //向服务器请求去除状态
@@ -183,7 +194,7 @@ namespace CardServerControl.Model.Cards
         /// </summary>
         public void AppendState(StateSkill state)
         {
-            this.PlayerCardState.Add(state);
+            this.playerCardState.Add(state);
             LogsSystem.Instance.Print(string.Format("卡片{0}获得了状态{1}", this.cardName, state.skillName), LogLevel.GAMEDETAIL);
         }
 

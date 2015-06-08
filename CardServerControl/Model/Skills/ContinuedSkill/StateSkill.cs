@@ -1,4 +1,5 @@
 ﻿using CardServerControl.Model.Cards;
+using LitJson;
 
 namespace CardServerControl.Model.Skills.ContinuedSkill
 {
@@ -42,6 +43,23 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
         public int GetRemainRounds()
         {
             return this.lastRound;
+        }
+
+        /// <summary>
+        /// 设置状态基本信息
+        /// </summary>
+        public void SetStateInfo(PlayerCard stateOwnerCard)
+        {
+            this.stateOwnerCard = stateOwnerCard;
+        }
+
+        public override string GenerateSkillAppendData()
+        {
+            JsonData json = new JsonData();
+            json["lastRound"] = this.lastRound;
+            json["allLastRound"] = this.allLastRound;
+
+            return json.ToJson();
         }
 
         /// <summary>

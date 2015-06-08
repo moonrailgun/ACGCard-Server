@@ -111,6 +111,8 @@ namespace CardServerControl.Util
             OperateStateData detail = new OperateStateData();
             detail.skillID = skill.skillID;
             detail.stateOperate = operateType;
+            detail.ownerCardUUID = operateCard.cardUUID;
+            detail.appendData = skill.GenerateSkillAppendData();//将技能生成的数据附加值传递
             switch (operateCard.GetCardOwnerPosition())
             {
                 case 0://A
