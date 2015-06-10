@@ -12,7 +12,7 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
         protected StateSkill(int skillID, string skillName, int lastRound)
             : base(skillID, skillName)
         {
-            this.allLastRound = this.allLastRound = lastRound;
+            this.lastRound = this.allLastRound = lastRound;
         }
 
         /// <summary>

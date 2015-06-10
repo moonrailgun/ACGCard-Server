@@ -31,6 +31,7 @@ namespace CardServerControl.Model.Skills
             AddSkill(new AttackSkill(5, "Thunderbolt", 90, 80));
             AddSkill(new AttackSkill(6, "MeteoriteCut", 80, 70));
             AddSkill(new AttackUp(7, "AttackUp", 3, 50));
+            AddSkill(new WeaponAttackUp(8, "WeaponAttackUp", 0, 0));
 
             LogsSystem.Instance.Print("技能数据加载完毕,共有 " + skillList.Count + " 个技能");
         }

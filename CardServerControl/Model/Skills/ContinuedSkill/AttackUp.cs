@@ -26,6 +26,15 @@ namespace CardServerControl.Model.Skills.ContinuedSkill
         public int GetAddedValue()
         { return this.value; }
 
+        /// <summary>
+        /// 重设攻击增加信息（用于多样化）
+        /// </summary>
+        public void ResetAttackUpData(int lastRound, int addValue)
+        {
+            this.lastRound = this.allLastRound = lastRound;
+            this.value = addValue;
+        }
+
         public override string GenerateSkillAppendData()
         {
             JsonData json = new JsonData();
