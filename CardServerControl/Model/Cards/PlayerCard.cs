@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CardServerControl.Util;
 using CardServerControl.Model.DTO.GameData;
+using CardServerControl.Model.Cards.EquipmentCards;
 
 namespace CardServerControl.Model.Cards
 {
@@ -28,7 +29,7 @@ namespace CardServerControl.Model.Cards
         protected GameRoom cardRoom;
         protected int cardOwnerPostion = -1;
         protected List<Skill> cardOwnSkill = new List<Skill>();
-        protected List<StateSkill> playerCardState = new List<StateSkill>();//卡品上附加的数据
+        protected List<StateSkill> playerCardState = new List<StateSkill>();//卡片上附加的状态
 
         #region 属性获取
         public int GetHealth()
@@ -125,6 +126,106 @@ namespace CardServerControl.Model.Cards
                 LogsSystem.Instance.Print("卡片上不具备该技能：" + skill.skillName, LogLevel.WARN);
             }
         }
+        #endregion
+
+        #region 装备操作
+        public PlayerEquipment playerEquipment = new PlayerEquipment();
+
+        protected class PlayerEquipment
+        {
+            public EquipmentCard weapon;//武器
+            public EquipmentCard armor;//盔甲
+            public EquipmentCard jewelry1;//首饰1
+            public EquipmentCard jewelry2;//首饰2
+
+            /// <summary>
+            /// 装备装备卡
+            /// </summary>
+            public void Equip(Position position, EquipmentCard equip)
+            {
+                if (position == Position.Weapon)
+                {
+                    if (this.weapon == null)
+                    {
+                        //角色没有装备
+                        this.weapon = equip;
+                    }
+                    else
+                    {
+                        //角色已经有装备了
+                        this.weapon.OnUnequiped();
+                        this.weapon = equip;
+                    }
+                }
+                else if (position == Position.Armor)
+                {
+                    if (this.armor == null)
+                    {
+                        //角色没有装备
+                        this.armor = equip;
+                    }
+                    else
+                    {
+                        //角色已经有装备了
+                        this.armor.OnUnequiped();
+                        this.armor = equip;
+                    }
+                }
+                else if (position == Position.Jewelry)
+                {
+                    EquipmentCard jewelry = equip;
+                    //如果两个首饰槽都有装备了。覆盖稀有度小的。稀有度一样则随机覆盖
+                    if (this.jewelry1 != null && this.jewelry2 != null)
+                    {
+                        if (this.jewelry1.cardRarity != this.jewelry2.cardRarity)
+                        {
+                            //替换稀有度低的
+                            if (this.jewelry1.cardRarity > this.jewelry2.cardRarity)
+                            {
+                                this.jewelry1 = jewelry;
+                            }
+                            else
+                            {
+                                this.jewelry2 = jewelry;
+                            }
+                        }
+                        else
+                        {
+                            //随机替换
+                            System.Random random = new System.Random();
+                            float randVal = (float)random.Next(0, 1000) / 1000;
+
+                            if (randVal < 0.5f)
+                            {
+                                this.jewelry1 = jewelry;
+                            }
+                            else
+                            {
+                                this.jewelry2 = jewelry;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (this.jewelry1 == null)
+                        {
+                            this.jewelry1 = jewelry;
+                        }
+                        else if (this.jewelry2 == null)
+                        {
+                            this.jewelry2 = jewelry;
+                        }
+                    }
+                }
+            }
+
+            public enum Position
+            {
+                Weapon, Armor, Jewelry
+            }
+        }
+
+
         #endregion
 
         public void SetPlayerCardInfo(int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)

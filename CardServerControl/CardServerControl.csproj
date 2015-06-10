@@ -84,6 +84,8 @@
     <Compile Include="Model\Cards\Card.cs" />
     <Compile Include="Model\Cards\CharacterCard.cs" />
     <Compile Include="Model\CardInfo.cs" />
+    <Compile Include="Model\Cards\EquipmentCards\EquipmentCard.cs" />
+    <Compile Include="Model\Cards\ItemCard.cs" />
     <Compile Include="Model\Cards\PlayerCard.cs" />
     <Compile Include="Model\DTO\CardInfoDTO.cs" />
     <Compile Include="Model\DTO\ChatDTO.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="Model\ReturnCode.cs" />
     <Compile Include="Model\Skills\ContinuedSkill\AttackUp.cs" />
     <Compile Include="Model\Skills\ContinuedSkill\StateSkill.cs" />
+    <Compile Include="Model\Skills\ContinuedSkill\WeaponAttackUp.cs" />
     <Compile Include="Model\Skills\InstantSkill\AttackSkill.cs" />
     <Compile Include="Model\Skills\Skill.cs" />
     <Compile Include="Model\Skills\SkillManager.cs" />
