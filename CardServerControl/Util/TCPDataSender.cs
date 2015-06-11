@@ -146,6 +146,15 @@ namespace CardServerControl.Util
         }
 
         /// <summary>
+        /// 发送装备修改框架
+        /// </summary>
+        public void SendEquipOperate()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
         /// 检查UUID是否合法
         /// </summary>
         public static bool CheckUUID(string uuid)

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LitJson;
 
 namespace CardServerControl.Model.Cards.EquipmentCards
 {
@@ -24,6 +22,16 @@ namespace CardServerControl.Model.Cards.EquipmentCards
         public virtual void OnUnequiped()
         {
 
+        }
+
+        public string GenerateEquipAppend()
+        {
+            JsonData json = new JsonData();
+
+            //----这里实现装备附加值的添加
+
+
+            return json.ToJson();
         }
     }
 }

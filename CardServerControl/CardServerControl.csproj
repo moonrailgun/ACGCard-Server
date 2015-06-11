@@ -97,6 +97,7 @@
     <Compile Include="Model\DTO\GameData\AttackData.cs" />
     <Compile Include="Model\DTO\GameData\GameDetailData.cs" />
     <Compile Include="Model\DTO\GameData\GamePlayerOwnCardData.cs" />
+    <Compile Include="Model\DTO\GameData\OperateEquipData.cs" />
     <Compile Include="Model\DTO\GameData\OperateStateData.cs" />
     <Compile Include="Model\DTO\GameData\PlayerInfoData.cs" />
     <Compile Include="Model\DTO\GameData\PlayerSocket.cs" />
