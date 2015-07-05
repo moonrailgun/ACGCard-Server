@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Net;
 using CardServerControl.Model.Cards;
 using CardServerControl.Model.Skills;
+using CardServerControl.Model.Cards.EquipmentCards;
 
 namespace CardServerControl.Util
 {
@@ -61,6 +62,10 @@ namespace CardServerControl.Util
                 case OperateCode.PlayerOwnCard:
                     {
                         return ProcessPlayerOwnCard(data, socket);
+                    }
+                case OperateCode.OperateEquip:
+                    {
+                        return ProcessOperateEquip(data, socket);
                     }
                 default:
                     {
@@ -244,8 +249,8 @@ namespace CardServerControl.Util
             UseSkillData detail = JsonCoding<UseSkillData>.decode(data.operateData);
             GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(data.roomID);
 
-            PlayerCard  from = room.GetPlayerCard(detail.fromCardUUID);
-            PlayerCard to = room.GetPlayerCard(detail.toCardUUID);
+            PlayerCard from = GetPlayerCard(data.roomID, detail.fromCardUUID);
+            PlayerCard to = GetPlayerCard(data.roomID, detail.toCardUUID);
             Skill skill = from.GetSkillById(detail.skillID);
 
             if (from.currentEnergy >= skill.skillEnergyCost)
@@ -282,6 +287,42 @@ namespace CardServerControl.Util
                 LogsSystem.Instance.Print("房间号不合法", LogLevel.WARN);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 处理对操作装备的请求
+        /// </summary>
+        private GameData ProcessOperateEquip(GameData data, Socket socket)
+        {
+            OperateEquipData detail = JsonCoding<OperateEquipData>.decode(data.operateData);
+            PlayerCard operateCard = GetPlayerCard(data.roomID, detail.operateCardUUID);
+            ItemCard operateItem = CardManager.Instance.GetItemCloneByID(detail.equipCardId);
+            if(operateItem is EquipmentCard)
+            {
+                EquipmentCard equipmentCard = operateItem as EquipmentCard;
+                int equipPosition = detail.equipPosition;
+                operateCard.playerEquipment.Equip(equipPosition, equipmentCard);
+            }
+            else
+            {
+                LogsSystem.Instance.Print("不合法操作");
+            }
+            
+
+            return null;
+        }
+
+
+
+        /// <summary>
+        /// 根据条件获取玩家卡片对象
+        /// </summary>
+        private PlayerCard GetPlayerCard(int roomID, string cardUUID)
+        {
+            GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(roomID);
+            PlayerCard playerCard = room.GetPlayerCard(cardUUID);
+
+            return playerCard;
         }
     }
 }

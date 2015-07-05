@@ -13,6 +13,13 @@ namespace CardServerControl.Model.Cards
     /// </summary>
     class PlayerCard : CharacterCard
     {
+        public PlayerCard()
+        {
+            this.cardOwnSkill = new List<Skill>();
+            this.playerCardState = new List<StateSkill>();
+            this.playerEquipment = new PlayerEquipment(this);
+        }
+
         public bool isAlive = true;
 
         public int cardOwnerId;
@@ -28,8 +35,8 @@ namespace CardServerControl.Model.Cards
 
         protected GameRoom cardRoom;
         protected int cardOwnerPostion = -1;
-        protected List<Skill> cardOwnSkill = new List<Skill>();
-        protected List<StateSkill> playerCardState = new List<StateSkill>();//卡片上附加的状态
+        protected List<Skill> cardOwnSkill;
+        protected List<StateSkill> playerCardState;//卡片上附加的状态
 
         #region 属性获取
         public int GetHealth()
@@ -129,10 +136,15 @@ namespace CardServerControl.Model.Cards
         #endregion
 
         #region 装备操作
-        public PlayerEquipment playerEquipment = new PlayerEquipment();
+        public PlayerEquipment playerEquipment;
 
-        protected class PlayerEquipment
+        public class PlayerEquipment
         {
+            public PlayerEquipment(PlayerCard playerCard)
+            { this.playerCard = playerCard; }
+
+            public PlayerCard playerCard;
+
             public EquipmentCard weapon;//武器
             public EquipmentCard armor;//盔甲
             public EquipmentCard jewelry1;//首饰1
@@ -141,87 +153,107 @@ namespace CardServerControl.Model.Cards
             /// <summary>
             /// 装备装备卡
             /// </summary>
+            public void Equip(int postion, EquipmentCard equip)
+            {
+                this.Equip((Position)postion, equip);
+            }
             public void Equip(Position position, EquipmentCard equip)
             {
-                if (position == Position.Weapon)
+                switch (position)
                 {
-                    if (this.weapon == null)
-                    {
-                        //角色没有装备
-                        this.weapon = equip;
-                    }
-                    else
-                    {
-                        //角色已经有装备了
-                        this.weapon.OnUnequiped();
-                        this.weapon = equip;
-                    }
-                }
-                else if (position == Position.Armor)
-                {
-                    if (this.armor == null)
-                    {
-                        //角色没有装备
-                        this.armor = equip;
-                    }
-                    else
-                    {
-                        //角色已经有装备了
-                        this.armor.OnUnequiped();
-                        this.armor = equip;
-                    }
-                }
-                else if (position == Position.Jewelry)
-                {
-                    EquipmentCard jewelry = equip;
-                    //如果两个首饰槽都有装备了。覆盖稀有度小的。稀有度一样则随机覆盖
-                    if (this.jewelry1 != null && this.jewelry2 != null)
-                    {
-                        if (this.jewelry1.cardRarity != this.jewelry2.cardRarity)
+                    case Position.Weapon:
                         {
-                            //替换稀有度低的
-                            if (this.jewelry1.cardRarity > this.jewelry2.cardRarity)
+                            if (this.weapon == null)
                             {
-                                this.jewelry1 = jewelry;
+                                //角色没有装备
+                                this.weapon = equip;
+                                equip.OnEquiped(playerCard);
                             }
                             else
                             {
-                                this.jewelry2 = jewelry;
+                                //角色已经有装备了
+                                this.weapon.OnUnequiped();
+                                this.weapon = equip;
+                                equip.OnEquiped(playerCard);
                             }
+                            break;
                         }
-                        else
+                    case Position.Armor:
                         {
-                            //随机替换
-                            System.Random random = new System.Random();
-                            float randVal = (float)random.Next(0, 1000) / 1000;
+                            if (this.armor == null)
+                            {
+                                //角色没有装备
+                                this.armor = equip;
+                                equip.OnEquiped(playerCard);
+                            }
+                            else
+                            {
+                                //角色已经有装备了
+                                this.armor.OnUnequiped();
+                                this.armor = equip;
+                                equip.OnEquiped(playerCard);
+                            }
+                            break;
+                        }
+                    case Position.Jewelry:
+                        {
+                            EquipmentCard jewelry = equip;
+                            equip.OnEquiped(playerCard);
+                            //如果两个首饰槽都有装备了。覆盖稀有度小的。稀有度一样则随机覆盖
+                            if (this.jewelry1 != null && this.jewelry2 != null)
+                            {
+                                if (this.jewelry1.cardRarity != this.jewelry2.cardRarity)
+                                {
+                                    //替换稀有度低的
+                                    if (this.jewelry1.cardRarity > this.jewelry2.cardRarity)
+                                    {
+                                        this.jewelry1 = jewelry;
+                                    }
+                                    else
+                                    {
+                                        this.jewelry2 = jewelry;
+                                    }
+                                }
+                                else
+                                {
+                                    //随机替换
+                                    System.Random random = new System.Random();
+                                    float randVal = (float)random.Next(0, 1000) / 1000;
 
-                            if (randVal < 0.5f)
-                            {
-                                this.jewelry1 = jewelry;
+                                    if (randVal < 0.5f)
+                                    {
+                                        this.jewelry1 = jewelry;
+                                    }
+                                    else
+                                    {
+                                        this.jewelry2 = jewelry;
+                                    }
+                                }
                             }
                             else
                             {
-                                this.jewelry2 = jewelry;
+                                if (this.jewelry1 == null)
+                                {
+                                    this.jewelry1 = jewelry;
+                                }
+                                else if (this.jewelry2 == null)
+                                {
+                                    this.jewelry2 = jewelry;
+                                }
                             }
+                            break;
                         }
-                    }
-                    else
-                    {
-                        if (this.jewelry1 == null)
+                    default:
                         {
-                            this.jewelry1 = jewelry;
+                            LogsSystem.Instance.Print("不合法的装备位置");
+                            break;
                         }
-                        else if (this.jewelry2 == null)
-                        {
-                            this.jewelry2 = jewelry;
-                        }
-                    }
                 }
             }
 
             public enum Position
             {
-                Weapon, Armor, Jewelry
+                Weapon = 1, Armor = 2, Jewelry = 3
             }
         }
 
@@ -337,7 +369,7 @@ namespace CardServerControl.Model.Cards
         /// </summary>        
         private static PlayerCard CreatePlayerCardByID(int cardID)
         {
-            CharacterCard character = CardManager.Instance.GetCardCloneByID(cardID);
+            CharacterCard character = CardManager.Instance.GetCharacterCloneByID(cardID);
             PlayerCard playerCard = new PlayerCard();
             playerCard.cardUUID = character.cardUUID;
             playerCard.cardId = character.cardId;

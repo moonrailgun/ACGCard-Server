@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CardServerControl.Model;
 using System.Data;
 using CardServerControl.Model.Cards;
 
@@ -31,9 +27,20 @@ namespace CardServerControl
         #endregion
 
         public Dictionary<int, CharacterCard> characterCardMap;
+        public Dictionary<int, ItemCard> itemCardMap;
 
+        #region 数据库初始化
         public CardManager()
         {
+            InitCharacterCardMap();
+            InitItemCardMap();
+        }
+        /// <summary>
+        /// 初始化角色卡
+        /// </summary>
+        private void InitCharacterCardMap()
+        {
+            LogsSystem.Instance.Print("正在从数据库获取英雄卡数据");
             try
             {
                 characterCardMap = new Dictionary<int, CharacterCard>();
@@ -75,6 +82,18 @@ namespace CardServerControl
             }
         }
 
+        /// <summary>
+        /// 初始化道具卡
+        /// </summary>
+        private void InitItemCardMap()
+        {
+            LogsSystem.Instance.Print("正在从数据库获取道具卡数据");
+            throw new NotImplementedException();
+        }
+        #endregion
+
+
+        #region 角色卡操作
         public int GetRarityByCardId(int cardId)
         {
             if (characterCardMap.ContainsKey(cardId))
@@ -100,13 +119,34 @@ namespace CardServerControl
                 return "";
             }
         }
+        #endregion
 
         /// <summary>
         /// 根据ID获取卡片的克隆
         /// </summary>
-        public CharacterCard GetCardCloneByID(int cardId)
+        public CharacterCard GetCharacterCloneByID(int cardId)
         {
-            return characterCardMap[cardId].Clone() as CharacterCard;
+            if (characterCardMap.ContainsKey(cardId))
+            {
+                return characterCardMap[cardId].Clone() as CharacterCard;
+            }
+            else
+            {
+                LogsSystem.Instance.Print("[卡片管理器]无法找到该ID的卡片：" + cardId);
+                return null;
+            }
+        }
+        public ItemCard GetItemCloneByID(int cardId)
+        {
+            if (itemCardMap.ContainsKey(cardId))
+            {
+                return itemCardMap[cardId].Clone() as ItemCard;
+            }
+            else
+            {
+                LogsSystem.Instance.Print("[卡片管理器]无法找到该ID的卡片：" + cardId);
+                return null;
+            }
         }
     }
 }

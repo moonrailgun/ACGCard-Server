@@ -40,7 +40,7 @@ namespace CardServerControl.Util
                     {
                         int cardID = Convert.ToInt32(row["CardId"]);
 
-                        CharacterCard standardCharacterCard = cardManager.GetCardCloneByID(cardID);
+                        CharacterCard standardCharacterCard = cardManager.GetCharacterCloneByID(cardID);
 
                         PlayerCard playerCard = new PlayerCard();
                         //卡片通用

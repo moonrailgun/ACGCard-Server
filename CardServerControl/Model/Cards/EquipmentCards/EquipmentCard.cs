@@ -9,19 +9,21 @@ namespace CardServerControl.Model.Cards.EquipmentCards
         protected PlayerCard EquipedCard;//装备了该装备的英雄
 
         /// <summary>
-        /// 当装备装备时
+        /// 当装备被装备时
         /// </summary>
-        public virtual void OnEquiped()
+        public virtual void OnEquiped(PlayerCard playerCard)
         {
+            this.EquipedCard = playerCard;
 
+            //修改需要通告网络
         }
 
         /// <summary>
-        /// 当卸下装备时
+        /// 当装备被卸下时
         /// </summary>
         public virtual void OnUnequiped()
         {
-
+            //修改需要通告网络
         }
 
         public string GenerateEquipAppend()

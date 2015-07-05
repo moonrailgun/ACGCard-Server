@@ -88,7 +88,7 @@ namespace CardServerControl.Model
             }
             else
             {
-                LogsSystem.Instance.Print("场上找不要这张卡:" + cardUUID, LogLevel.WARN);
+                LogsSystem.Instance.Print("场上找不到这张卡:" + cardUUID, LogLevel.WARN);
                 return null;
             }
         }
