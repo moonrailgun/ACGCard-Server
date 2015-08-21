@@ -222,6 +222,59 @@ namespace CardServerControl.Util
             return model;
         }
 
+        public SocketModel InvInfoPacket(InvInfoDTO data)
+        {
+            int playerID = data.playerID;
+            string playerUUID = data.playerUUID;
+            int type = data.type;
+
+            int returnCode = ReturnCode.Success;//设定返回代码
+            if (CheckUUID(playerUUID))
+            {
+                string returnDate = "";
+                switch (type)
+                {
+                    case 1:
+                        {
+                            break;
+                        }
+                    case 2:
+                        {
+                            break;
+                        }
+                    case 3:
+                        {
+                            break;
+                        }
+                    case 4:
+                        {
+                            break;
+                        }
+                    default:
+                        {
+                            LogsSystem.Instance.Print("请求访问的类型非法非法:" + type, LogLevel.WARN);
+                            returnCode = ReturnCode.Failed;//请求失败
+                            return null;
+                        }
+                }
+                data.returnData = returnDate;
+            }
+            else
+            {
+                LogsSystem.Instance.Print("UUID非法:" + playerUUID, LogLevel.WARN);
+                returnCode = ReturnCode.Failed;//请求失败
+                return null;
+            }
+
+            //重新封装
+            SocketModel model = new SocketModel();
+            model.returnCode = returnCode;
+            model.protocol = SocketProtocol.INVINFO;
+            model.message = JsonCoding<InvInfoDTO>.encode(data);
+
+            return model;
+        }
+
         /// <summary>
         /// 返回断线信息包
         /// </summary>

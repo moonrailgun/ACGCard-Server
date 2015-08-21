@@ -171,6 +171,11 @@ namespace CardServerControl
                         returnModel = pp.CardInfoPacket(JsonCoding<CardInfoDTO>.decode(message));
                         break;
                     }
+                case SocketProtocol.INVINFO:
+                    {
+                        returnModel = pp.InvInfoPacket(JsonCoding<InvInfoDTO>.decode(message));
+                        break;
+                    }
                 default:
                     {
                         LogsSystem.Instance.Print("接收到未知的数据包:" + text, LogLevel.WARN);
