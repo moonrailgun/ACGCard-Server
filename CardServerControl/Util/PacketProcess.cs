@@ -257,8 +257,25 @@ namespace CardServerControl.Util
 
                             break;
                         }
-                    case 2:
+                    case 2://英雄页
                         {
+                            JsonData json = new JsonData();
+                            json.SetJsonType(JsonType.Array);//设置为数组
+
+                            //从数据库中获取玩家所有的英雄卡片的ID、是否上场并添加到返回字符串
+                            string command = string.Format("SELECT CardId,IsUsing FROM cardinventory WHERE CardOwnerId = '{0}' AND CardType = '{1}'", playerID,"Character");
+                            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+                            foreach (DataRow row in ds.Tables[0].Rows)
+                            {
+                                JsonData rowJson = new JsonData();
+                                rowJson["CardId"] = Convert.ToInt32(row["CardId"]);
+                                rowJson["IsUsing"] = Convert.ToBoolean(row["IsUsing"]);
+
+                                json.Add(rowJson);
+                            }
+
+                            returnData = json.ToJson();
+
                             break;
                         }
                     case 3:
