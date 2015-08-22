@@ -4,6 +4,7 @@ using System;
 using System.Data;
 using System.Net;
 using System.Collections.Generic;
+using LitJson;
 
 namespace CardServerControl.Util
 {
@@ -226,16 +227,34 @@ namespace CardServerControl.Util
         {
             int playerID = data.playerID;
             string playerUUID = data.playerUUID;
-            int type = data.type;
+            int type = data.type;//player = 1,Hero = 2,Guide = 3,Inv = 4
 
             int returnCode = ReturnCode.Success;//设定返回代码
             if (CheckUUID(playerUUID))
             {
-                string returnDate = "";
+                string returnData = "";
                 switch (type)
                 {
-                    case 1:
+                    case 1://玩家页
                         {
+                            JsonData json = new JsonData();
+                            json.SetJsonType(JsonType.Array);//设置为数组
+
+                            //从数据库中获取玩家所有的卡片的ID、类型、是否上场并添加到返回字符串
+                            string command = string.Format("SELECT CardId,CardType,IsUsing FROM cardinventory WHERE CardOwnerId = '{0}'", playerID);
+                            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+                            foreach (DataRow row in ds.Tables[0].Rows)
+                            {
+                                JsonData rowJson = new JsonData();
+                                rowJson["CardId"] = Convert.ToInt32(row["CardId"]);
+                                rowJson["CardType"] = row["CardType"].ToString();
+                                rowJson["IsUsing"] = Convert.ToBoolean(row["IsUsing"]);
+
+                                json.Add(rowJson);
+                            }
+
+                            returnData = json.ToJson();
+
                             break;
                         }
                     case 2:
@@ -257,7 +276,7 @@ namespace CardServerControl.Util
                             return null;
                         }
                 }
-                data.returnData = returnDate;
+                data.returnData = returnData;
             }
             else
             {
