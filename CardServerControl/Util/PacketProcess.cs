@@ -278,8 +278,43 @@ namespace CardServerControl.Util
 
                             break;
                         }
-                    case 3:
+                    case 3://图鉴页
                         {
+                            JsonData json = new JsonData();
+                            json.SetJsonType(JsonType.Array);//设置为数组
+
+                            //从数据库中获取玩家所有的英雄卡片的ID、是否上场并添加到返回字符串
+                            string format = "SELECT *,COUNT(inv.CardId) AS OwnNum, " +
+                                "MAX(inv.SpecialAttack + inv.SpecialEnergy+ inv.SpecialHealth+ inv.SpecialSpeed) AS Talent " +
+                                "FROM cardinventory as inv " +
+                                "LEFT JOIN card " +
+                                "ON inv.CardId = card.CardId " +
+                                "WHERE inv.CardOwnerId = {0} AND inv.CardType = {1}" +
+                                "GROUP BY inv.CardId";
+                            string command = string.Format(format, playerID, "Character");
+                            DataSet ds = MySQLHelper.GetDataSet(MySQLHelper.Conn, CommandType.Text, command, null);
+                            foreach (DataRow row in ds.Tables[0].Rows)
+                            {
+                                JsonData rowJson = new JsonData();
+                                rowJson["CardId"] = Convert.ToInt32(row["CardId"]);
+                                rowJson["CardName"] = Convert.ToString(row["CardName"]);
+                                rowJson["OwnNum"] = Convert.ToInt32(row["OwnNum"]);
+                                rowJson["MaxTalent"] = Convert.ToInt32(row["Talent"]);
+                                rowJson["CardRarity"] = Convert.ToInt32(row["CardRarity"]);
+                                rowJson["BaseHealth"] = Convert.ToInt32(row["BaseHealth"]);
+                                rowJson["BaseEnergy"] = Convert.ToInt32(row["BaseEnergy"]);
+                                rowJson["BaseAttack"] = Convert.ToInt32(row["BaseAttack"]);
+                                rowJson["BaseSpeed"] = Convert.ToInt32(row["BaseSpeed"]);
+                                rowJson["GrowHealth"] = Convert.ToInt32(row["GrowHealth"]);
+                                rowJson["GrowEnergy"] = Convert.ToInt32(row["GrowEnergy"]);
+                                rowJson["GrowAttack"] = Convert.ToInt32(row["GrowAttack"]);
+                                rowJson["GrowSpeed"] = Convert.ToInt32(row["GrowSpeed"]);
+
+                                json.Add(rowJson);
+                            }
+
+                            returnData = json.ToJson();
+
                             break;
                         }
                     case 4:
