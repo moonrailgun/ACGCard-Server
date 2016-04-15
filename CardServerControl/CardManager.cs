@@ -88,7 +88,8 @@ namespace CardServerControl
         private void InitItemCardMap()
         {
             LogsSystem.Instance.Print("正在从数据库获取道具卡数据");
-            throw new NotImplementedException();
+            //todo
+            //throw new NotImplementedException();
         }
         #endregion
 

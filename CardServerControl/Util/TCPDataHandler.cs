@@ -152,55 +152,18 @@ namespace CardServerControl.Util
                 if (room.playerSocketA.socket == socket)
                 {
                     //A
-                    if (room.playerDataA.IsOwnCard(cardUUID))
-                    {
-                        //正常召唤
-                        foreach (PlayerCard playerCard in room.playerDataA.characterCardInv)
-                        {
-                            if (playerCard.cardUUID == cardUUID)
-                            {
-                                room.playerDataA.AddPlayerCard(playerCard);//添加到英雄区
-                                LogsSystem.Instance.Print(string.Format("A召唤{0}到场上", playerCard.cardName));
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //报错
-                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:" + cardUUID, LogLevel.ERROR);
-                    }
+                    room.AddPlayerCardIntoStage(GameRoom.PlayerPosition.A, cardUUID, data);
                 }
                 else
                 {
                     //B
-                    if (room.playerDataB.IsOwnCard(cardUUID))
-                    {
-                        //正常召唤
-                        foreach (PlayerCard playerCard in room.playerDataB.characterCardInv)
-                        {
-                            if (playerCard.cardUUID == cardUUID)
-                            {
-                                room.playerDataB.AddPlayerCard(playerCard);//添加到英雄区
-                                LogsSystem.Instance.Print(string.Format("B召唤{0}到场上", playerCard.cardName));
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //报错
-                        LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:" + cardUUID, LogLevel.ERROR);
-                    }
+                    room.AddPlayerCardIntoStage(GameRoom.PlayerPosition.B, cardUUID, data);
                 }
             }
             else
             {
                 LogsSystem.Instance.Print(string.Format("出现异常:房间{0}内没有找到对应的socket链接", roomID), LogLevel.ERROR);
             }
-
-
-            room.SendOperateToAllPlayer(data);//将操作数据原样返回
 
             return null;//把数据原样返回
         }

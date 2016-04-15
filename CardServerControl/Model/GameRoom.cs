@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CardServerControl.Model.DTO.GameData;
 using CardServerControl.Model.Cards;
+using CardServerControl.Util;
 
 namespace CardServerControl.Model
 {
@@ -16,6 +17,12 @@ namespace CardServerControl.Model
         public PlayerSocket playerSocketB;
         public GamePlayerData playerDataA;
         public GamePlayerData playerDataB;
+
+        public bool isWaitGameStart = true;
+        public bool isPlayerReadyA = false;
+        public bool isPlayerReadyB = false;
+
+        public PlayerPosition roundOwner;//当前回合的玩家位置
 
         public GameRoom(int roomID, PlayerSocket playerSocketA, PlayerSocket playerSocketB)
         {
@@ -185,5 +192,86 @@ namespace CardServerControl.Model
 
         public enum PlayerPosition
         { A = 0, B = 1 }
+
+        #region 游戏玩家操作处理
+        /// <summary>
+        /// 添加角色卡到场上
+        /// </summary>
+        public void AddPlayerCardIntoStage(PlayerPosition position, string cardUUID, GameData data)
+        {
+            GamePlayerData gamePlayerData;
+            if (position == PlayerPosition.A)
+            {
+                gamePlayerData = this.playerDataA;
+            }
+            else
+            {
+                gamePlayerData = this.playerDataB;
+            }
+            if (gamePlayerData.IsOwnCard(cardUUID))
+            {
+                foreach (PlayerCard playerCard in gamePlayerData.characterCardInv)
+                {
+                    if (cardUUID == playerCard.cardUUID)
+                    {
+                        gamePlayerData.AddPlayerCard(playerCard);//添加到英雄区
+                        LogsSystem.Instance.Print(string.Format("{1}召唤{0}到场上", playerCard.cardName, position));
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                LogsSystem.Instance.Print("程序出现异常：没有找到该卡的UUID:" + cardUUID, LogLevel.ERROR);
+            }
+            SendOperateToAllPlayer(data);//转发信息
+
+
+            //处理召唤
+            if (isWaitGameStart)
+            {
+                //游戏尚未正式开始
+                if (position == PlayerPosition.A)
+                {
+                    isPlayerReadyA = true;
+                }
+                else
+                {
+                    isPlayerReadyB = true;
+                }
+
+                if (isPlayerReadyA && isPlayerReadyB)
+                {
+                    GameStart();
+                }
+            }
+        }
+        /// <summary>
+        /// 游戏正式开始
+        /// </summary>
+        public void GameStart()
+        {
+            isWaitGameStart = false;
+
+            //角色A先手
+            SendRoundSwitch(PlayerPosition.A);
+        }
+        /// <summary>
+        /// 设置当前回合所有者
+        /// </summary>
+        public void SendRoundSwitch(PlayerPosition position)
+        {
+            this.roundOwner = position;
+            RoundSwtichData detail = new RoundSwtichData();
+            detail.roundPosition = (int)position;
+
+            GameData data = new GameData();
+            data.roomID = this.roomID;
+            data.operateCode = OperateCode.RoundSwitch;
+            data.returnCode = ReturnCode.Success;
+            data.operateData = JsonCoding<RoundSwtichData>.encode(detail);
+            SendOperateToAllPlayer(data);//发送信息
+        }
+        #endregion
     }
 }

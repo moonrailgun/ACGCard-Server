@@ -16,5 +16,6 @@
         public const int SummonCharacter = 34;
         public const int OperateState = 35;
         public const int OperateEquip = 36;
+        public const int RoundSwitch = 37;
     }
 }
