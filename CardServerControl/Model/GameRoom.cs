@@ -79,6 +79,10 @@ namespace CardServerControl.Model
                 return null;
             }
         }
+        public GamePlayerData GetPlayerDataByPositionSign(PlayerPosition position)
+        {
+            return GetPlayerDataByPositionSign((int)position);
+        }
 
         /// <summary>
         /// 根据卡片UUID获取场上的卡片
@@ -188,6 +192,15 @@ namespace CardServerControl.Model
                     return null;
                 }
             }
+            public List<PlayerCard> GetAllPlayerCard()
+            {
+                List<PlayerCard> playerCard = new List<PlayerCard>();
+                foreach (KeyValuePair<string, PlayerCard> pair in this.characterCard)
+                {
+                    playerCard.Add(pair.Value);
+                }
+                return playerCard;
+            }
         }
 
         public enum PlayerPosition
@@ -261,6 +274,13 @@ namespace CardServerControl.Model
         /// </summary>
         public void SendRoundSwitch(PlayerPosition position)
         {
+            GamePlayerData playerData = GetPlayerDataByPositionSign(position);
+            foreach (PlayerCard playerCard in playerData.GetAllPlayerCard())
+            {
+                //设置所有卡片可用
+                playerCard.SetAvailable(true);
+            }
+
             this.roundOwner = position;
             RoundSwtichData detail = new RoundSwtichData();
             detail.roundPosition = (int)position;

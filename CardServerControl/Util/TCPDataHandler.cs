@@ -185,13 +185,31 @@ namespace CardServerControl.Util
             int damage = 0;
             if (room.playerDataA.IsOwnCard(fromCardUUID))
             {
-                damage = room.playerDataA.GetPlayerCardByCardUUID(fromCardUUID).GetAttack();//获取攻击力
-                room.playerDataB.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
+                PlayerCard fromPlayerCard = room.playerDataA.GetPlayerCardByCardUUID(fromCardUUID);
+                if (!fromPlayerCard.GetAvailable())
+                {
+                    LogsSystem.Instance.Print(string.Format("无法进行操作的卡片正在尝试发起攻击,[A:{0} -> B:{1}]", fromCardUUID, toCardUUID), LogLevel.WARN);
+                }
+                else
+                {
+                    damage = fromPlayerCard.GetAttack();//获取攻击力
+                    room.playerDataB.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
+                    fromPlayerCard.SetAvailable(false);
+                }
             }
             else if (room.playerDataB.IsOwnCard(fromCardUUID))
             {
-                damage = room.playerDataB.GetPlayerCardByCardUUID(fromCardUUID).GetAttack();//获取攻击力
-                room.playerDataA.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
+                PlayerCard fromPlayerCard = room.playerDataB.GetPlayerCardByCardUUID(fromCardUUID);
+                if (!fromPlayerCard.GetAvailable())
+                {
+                    LogsSystem.Instance.Print(string.Format("无法进行操作的卡片正在尝试发起攻击,[B:{0} -> A:{1}]", fromCardUUID, toCardUUID), LogLevel.WARN);
+                }
+                else
+                {
+                    damage = fromPlayerCard.GetAttack();//获取攻击力
+                    room.playerDataA.GetPlayerCardByCardUUID(toCardUUID).GetDamage(damage);//伤害扣血
+                    fromPlayerCard.SetAvailable(false);
+                }
             }
             else
             {
@@ -216,15 +234,16 @@ namespace CardServerControl.Util
             PlayerCard to = GetPlayerCard(data.roomID, detail.toCardUUID);
             Skill skill = from.GetSkillById(detail.skillID);
 
-            if (from.currentEnergy >= skill.skillEnergyCost)
+            if (from.isAlive && from.GetAvailable() && from.currentEnergy >= skill.skillEnergyCost)
             {
-                //拥有足够能量
+                //拥有足够能量且卡片可用
                 skill.OnUse(from, to);//调用技能
                 detail.skillAppendData = skill.GenerateSkillAppendData();
+                from.SetAvailable(false);
             }
             else
             {
-                //没有足够能量
+                //没有足够能量或卡片不可用
                 data.returnCode = ReturnCode.Failed;
             }
 
@@ -260,7 +279,7 @@ namespace CardServerControl.Util
             OperateEquipData detail = JsonCoding<OperateEquipData>.decode(data.operateData);
             PlayerCard operateCard = GetPlayerCard(data.roomID, detail.operateCardUUID);
             ItemCard operateItem = CardManager.Instance.GetItemCloneByID(detail.equipCardId);
-            if(operateItem is EquipmentCard)
+            if (operateItem is EquipmentCard)
             {
                 EquipmentCard equipmentCard = operateItem as EquipmentCard;
                 int equipPosition = detail.equipPosition;
@@ -270,7 +289,7 @@ namespace CardServerControl.Util
             {
                 LogsSystem.Instance.Print("不合法操作");
             }
-            
+
 
             return null;
         }

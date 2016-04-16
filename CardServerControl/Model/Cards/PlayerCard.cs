@@ -20,7 +20,7 @@ namespace CardServerControl.Model.Cards
             this.playerEquipment = new PlayerEquipment(this);
         }
 
-        public bool isAlive = true;
+        public bool isAlive = true;//卡片是否存活
 
         public int cardOwnerId;
         public int cardLevel;
@@ -32,6 +32,8 @@ namespace CardServerControl.Model.Cards
         public int currentEnergy;
         public int maxHealth;
         public int maxEnergy;
+
+        protected bool isAvailable = true;//卡片是否可用
 
         protected GameRoom cardRoom;
         protected int cardOwnerPostion = -1;
@@ -258,6 +260,15 @@ namespace CardServerControl.Model.Cards
         }
 
 
+        #endregion
+
+        #region 卡片可用性
+        public bool GetAvailable(){
+            return this.isAvailable;
+        }
+        public void SetAvailable(bool available) {
+            this.isAvailable = available;
+        }
         #endregion
 
         public void SetPlayerCardInfo(int cardOwnerId, int cardLevel, int specialHealth, int specialEnergy, int specialAttack, int specialSpeed)
