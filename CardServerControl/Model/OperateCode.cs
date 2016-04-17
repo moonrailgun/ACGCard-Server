@@ -17,5 +17,7 @@
         public const int OperateState = 35;
         public const int OperateEquip = 36;
         public const int RoundSwitch = 37;
+        public const int OperateHandCard = 38;
+        public const int RoundDown = 39;
     }
 }

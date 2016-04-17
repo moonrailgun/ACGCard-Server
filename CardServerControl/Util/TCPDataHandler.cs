@@ -67,8 +67,13 @@ namespace CardServerControl.Util
                     {
                         return ProcessOperateEquip(data, socket);
                     }
+                case OperateCode.RoundDown:
+                    {
+                        return ProcessRoundDown(data, socket);
+                    }
                 default:
                     {
+                        LogsSystem.Instance.Print(string.Format("未知的操作编号{0}", operateCode));
                         break;
                     }
             }
@@ -266,7 +271,7 @@ namespace CardServerControl.Util
             }
             else
             {
-                LogsSystem.Instance.Print("房间号不合法", LogLevel.WARN);
+                LogsSystem.Instance.Print(string.Format("房间号不合法:{0}", data.roomID), LogLevel.WARN);
                 return null;
             }
         }
@@ -293,8 +298,36 @@ namespace CardServerControl.Util
 
             return null;
         }
-
-
+        /// <summary>
+        /// 处理回合结束操作
+        /// </summary>
+        private GameData ProcessRoundDown(GameData data, Socket socket)
+        {
+            GameRoom room = TcpServer.Instance.GetGameRoomManager().GetRoom(data.roomID);
+            if (room != null)
+            {
+                if (room.playerSocketA.socket == socket)
+                {
+                    //A结束。设置B的回合
+                    room.SendRoundSwitch(GameRoom.PlayerPosition.B);
+                }
+                else if (room.playerSocketB.socket == socket)
+                {
+                    //B结束。设置A的回合
+                    room.SendRoundSwitch(GameRoom.PlayerPosition.A);
+                }
+                else
+                {
+                    LogsSystem.Instance.Print("非法的连接");
+                }
+                return null;
+            }
+            else
+            {
+                LogsSystem.Instance.Print(string.Format("房间号不合法:{0}", data.roomID), LogLevel.WARN);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 根据条件获取玩家卡片对象
