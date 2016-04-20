@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardServerControl.Model.DTO.GameData
 {
-    public class RoundSwtichData : CommonDTO
+    class RoundSwtichData : CommonDTO
     {
         public int roundPosition;
     }

@@ -19,5 +19,6 @@
         public const int RoundSwitch = 37;
         public const int OperateHandCard = 38;
         public const int RoundDown = 39;
+        public const int GameStart = 40;
     }
 }

@@ -84,6 +84,22 @@ namespace CardServerControl.Model
             return GetPlayerDataByPositionSign((int)position);
         }
 
+        private int GetOppositePositionSign(int position)
+        {
+            return (int)GetOppositePositionSign((PlayerPosition)position);
+        }
+        private PlayerPosition GetOppositePositionSign(PlayerPosition position)
+        {
+            if (position == PlayerPosition.A)
+            {
+                return PlayerPosition.B;
+            }
+            else
+            {
+                return PlayerPosition.A;
+            }
+        }
+
         /// <summary>
         /// 根据卡片UUID获取场上的卡片
         /// </summary>
@@ -266,8 +282,7 @@ namespace CardServerControl.Model
         {
             isWaitGameStart = false;
 
-            //角色A先手
-            SendRoundSwitch(PlayerPosition.A);
+            SendGameStart(PlayerPosition.A);
         }
         /// <summary>
         /// 设置当前回合所有者
@@ -288,6 +303,37 @@ namespace CardServerControl.Model
             GameData data = new GameData();
             data.roomID = this.roomID;
             data.operateCode = OperateCode.RoundSwitch;
+            data.returnCode = ReturnCode.Success;
+            data.operateData = JsonCoding<RoundSwtichData>.encode(detail);
+            SendOperateToAllPlayer(data);//发送信息
+        }
+        /// <summary>
+        /// 发送信息游戏开始.只能被调用一次
+        /// </summary>
+        public void SendGameStart(PlayerPosition position)
+        {
+            //可用玩家
+            GamePlayerData playerData = GetPlayerDataByPositionSign(position);
+            foreach (PlayerCard playerCard in playerData.GetAllPlayerCard())
+            {
+                //设置所有卡片可用
+                playerCard.SetAvailable(true);
+            }
+            //不可用玩家
+            GamePlayerData oppositePlayerData = GetPlayerDataByPositionSign(GetOppositePositionSign(position));
+            foreach (PlayerCard playerCard in oppositePlayerData.GetAllPlayerCard())
+            {
+                //设置所有卡片不可用
+                playerCard.SetAvailable(false);
+            }
+
+            this.roundOwner = position;
+            RoundSwtichData detail = new RoundSwtichData();
+            detail.roundPosition = (int)position;
+
+            GameData data = new GameData();
+            data.roomID = this.roomID;
+            data.operateCode = OperateCode.GameStart;
             data.returnCode = ReturnCode.Success;
             data.operateData = JsonCoding<RoundSwtichData>.encode(detail);
             SendOperateToAllPlayer(data);//发送信息
