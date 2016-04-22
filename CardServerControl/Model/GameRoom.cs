@@ -280,6 +280,7 @@ namespace CardServerControl.Model
         /// </summary>
         public void GameStart()
         {
+            LogsSystem.Instance.Print("游戏开始", LogLevel.GAMEDETAIL);
             isWaitGameStart = false;
 
             SendGameStart(PlayerPosition.A);
