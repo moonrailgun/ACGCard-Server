@@ -43,6 +43,7 @@ namespace CardServerControl
             log = LogsSystem.Instance;
             pp = new PacketProcess();
             cardManager = CardManager.Instance;
+            cardManager.Load();//读取卡片数据（更新）
         }
 
         public void Connect()

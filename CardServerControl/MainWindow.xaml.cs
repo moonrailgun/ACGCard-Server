@@ -19,7 +19,7 @@ namespace CardServerControl
     public partial class MainWindow : Window
     {
         #region 版本信息
-        public string internalVersion = "2015052601";//内部版本号
+        public string internalVersion = "20160422";//内部版本号
         public string officialVersion = "0.1Beta";//正式版本号
         #endregion
 

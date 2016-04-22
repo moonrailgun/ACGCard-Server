@@ -30,8 +30,7 @@ namespace CardServerControl
         public Dictionary<int, ItemCard> itemCardMap;
 
         #region 数据库初始化
-        public CardManager()
-        {
+        public void Load(){
             InitCharacterCardMap();
             InitItemCardMap();
         }
@@ -74,7 +73,7 @@ namespace CardServerControl
                     }
                 }
 
-                LogsSystem.Instance.Print("卡片数据加载完毕");
+                LogsSystem.Instance.Print(string.Format("卡片数据加载完毕，共加载卡片{0}张", characterCardMap.Count));
             }
             catch (Exception ex)
             {
